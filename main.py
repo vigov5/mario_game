@@ -1,5 +1,4 @@
 import sys
-
 import pygame
 
 import mario
@@ -8,7 +7,7 @@ import config
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
-class Game():
+class MarioGame():
 
     width = 640
     height = 480
@@ -21,14 +20,17 @@ class Game():
         self.size = (self.width, self.height)
         self.screen = pygame.display.set_mode(self.size)
         self.clock = self.pygame.time.Clock()
+        self.time_step = 0
         # TODO: init sprite, tile,...
-        self.mario_sprite = mario.Mario()
+        self.my_mario = mario.Mario(self)
+        self.mariosprite = pygame.sprite.RenderPlain(self.my_mario)
 
     def run(self):
         # main game loop
         while True:
             # hold frame rate at 60 fps
-            self.clock.tick(1000)
+            self.clock.tick(60)
+            self.time_step += 1
             # enumerate event
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -48,16 +50,16 @@ class Game():
             textpos = text.get_rect(centerx=self.width/2)
             self.screen.blit(text, textpos)
         # TODO: sprite draw
-        self.mario_sprite.draw(self.screen)
+        self.mariosprite.draw(self.screen)
         self.pygame.display.flip()
 
     def update(self):
-        self.mario_sprite.update()
+        self.mariosprite.update()
 
     def handle(self, event):
-        self.mario_sprite.handle(event)
+        pass
 
 if __name__ == '__main__':
-    g = Game()
+    g = MarioGame()
     g.init()
     g.run()
