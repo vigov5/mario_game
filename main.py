@@ -3,11 +3,12 @@ import pygame
 
 import mario
 import config
+import tmx
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
-class MarioGame():
+class MarioGame(object):
 
     width = 640
     height = 480
@@ -22,14 +23,19 @@ class MarioGame():
         self.clock = self.pygame.time.Clock()
         self.time_step = 0
         # TODO: init sprite, tile,...
-        self.my_mario = mario.Mario(self)
-        self.mariosprite = pygame.sprite.RenderPlain(self.my_mario)
+        self.tilemap = tmx.load('map.tmx', self.screen.get_size())
+        start_cell = self.tilemap.layers['triggers'].find('player')[0]
+
+        self.sprites = tmx.SpriteLayer()
+        self.my_mario = mario.Mario(self.sprites)
+        self.my_mario.set_position(start_cell.px, start_cell.py)
+        self.tilemap.layers.append(self.sprites)
 
     def run(self):
         # main game loop
         while True:
             # hold frame rate at 60 fps
-            self.clock.tick(60)
+            dt = self.clock.tick(60)
             self.time_step += 1
             # enumerate event
             for event in pygame.event.get():
@@ -38,23 +44,23 @@ class MarioGame():
                 # sprite handle event
                 self.handle(event)
 
-            self.update()
+            self.tilemap.update(dt / 1000., self)
             # re-draw screen
             self.draw(self.screen)
 
     def draw(self, screen):
-        screen.fill(config.WHITE)
+        screen.fill(config.SKY)
         if pygame.font:
             font = pygame.font.Font(None, 36)
             text = font.render("Hello World !", 1, (255, 0, 0))
             textpos = text.get_rect(centerx=self.width/2)
             self.screen.blit(text, textpos)
         # TODO: sprite draw
-        self.mariosprite.draw(self.screen)
+        self.tilemap.draw(screen)
         self.pygame.display.flip()
 
     def update(self):
-        self.mariosprite.update()
+        self.my_mario.update()
 
     def handle(self, event):
         self.my_mario.handle(event)
