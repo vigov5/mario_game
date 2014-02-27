@@ -21,24 +21,23 @@ class Mario(pygame.sprite.Sprite):
     MAX_VX = 3
     MAX_VY = 20
 
-    def __init__(self, game):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, *groups):
+        super(Mario, self).__init__(*groups)
         img_path = os.path.join(config.image_path, self.img_file)
         self.sprite_imgs = pygame.image.load(img_path)
         self.image = self.set_sprite(self.index)
         self.rect = self.image.get_rect()
         self.pos = self.rect
-        self.game = game
         self.vx = 0
         self.vy = 0
-        self.v_state = "standing"
+        self.v_state = "resting"
         self.h_state = "standing"
         self.facing = "right"
 
     def handle(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                if self.v_state == "standing":
+                if self.v_state == "resting":
                     self.jump()
             elif event.key == pygame.K_RIGHT:
                 self.move_right()
@@ -49,6 +48,10 @@ class Mario(pygame.sprite.Sprite):
                 event.key == pygame.K_LEFT:
                 self.vx = 0
                 self.h_state = "standing"
+
+    def set_position(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
 
     def jump(self):
         self.vy = -9
@@ -65,7 +68,8 @@ class Mario(pygame.sprite.Sprite):
         self.facing = "right"
 
 
-    def update(self):
+    def update(self, dt, game):
+        last = self.rect.copy()
         if abs(self.vx) > self.MAX_VX:
             self.vx = math.copysign(self.MAX_VX, self.vx)
         if abs(self.vy) > self.MAX_VY:
@@ -74,13 +78,27 @@ class Mario(pygame.sprite.Sprite):
         dx = self.vx
         self.vy += self.GRAVITY
         self.rect = self.rect.move(dx, dy)
-        if self.rect.bottom > 200:
-            self.rect.bottom = 200
-            self.v_state = "standing"
-            self.vy = 0
+
+        new = self.rect
+        for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
+            if last.right <= cell.left and new.right > cell.left:
+                new.right = cell.left
+            if last.left >= cell.right and new.left < cell.right:
+                new.left = cell.right
+            if last.bottom <= cell.top and new.bottom > cell.top:
+                new.bottom = cell.top
+                self.v_state = "resting"
+                self.vy = 0
+            if last.top >= cell.bottom and new.top < cell.bottom:
+                print last
+                print new
+                new.top = cell.bottom
+                self.vy = 0
+
+        game.tilemap.set_focus(new.x, new.y)
 
         # change sprite
-        if self.game.time_step % self.ANIMATION_INTERVAL == 0:
+        if game.time_step % self.ANIMATION_INTERVAL == 0:
             if self.v_state == "jumping":
                 self.image = self.set_sprite(self.JUMP)
             else:
