@@ -57,7 +57,7 @@ class MarioGame():
         self.mariosprite.update()
 
     def handle(self, event):
-        pass
+        self.my_mario.handle(event)
 
 if __name__ == '__main__':
     g = MarioGame()

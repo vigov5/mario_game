@@ -1,4 +1,5 @@
 import os
+import math
 import pygame
 
 import config
@@ -11,9 +12,14 @@ class Mario(pygame.sprite.Sprite):
     img_file = "small_mario.png"
     STAND = 0
     RUNNING = [0, 1]
+    JUMP = 3
     index = STAND
     loaded_sprites = {}
-    ANIMATION_INTERVAL = 10
+    ANIMATION_INTERVAL = 5
+
+    GRAVITY = 0.4
+    MAX_VX = 3
+    MAX_VY = 20
 
     def __init__(self, game):
         pygame.sprite.Sprite.__init__(self)
@@ -23,15 +29,69 @@ class Mario(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = self.rect
         self.game = game
+        self.vx = 0
+        self.vy = 0
+        self.v_state = "standing"
+        self.h_state = "standing"
+        self.facing = "right"
 
     def handle(self, event):
-        pass
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                if self.v_state == "standing":
+                    self.jump()
+            elif event.key == pygame.K_RIGHT:
+                self.move_right()
+            elif event.key == pygame.K_LEFT:
+                self.move_left()
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_RIGHT or \
+                event.key == pygame.K_LEFT:
+                self.vx = 0
+                self.h_state = "standing"
+
+    def jump(self):
+        self.vy = -9
+        self.v_state = "jumping"
+
+    def move_left(self):
+        self.vx = -2.5
+        self.h_state = "running"
+        self.facing = "left"
+
+    def move_right(self):
+        self.vx = 2.5
+        self.h_state = "running"
+        self.facing = "right"
+
 
     def update(self):
+        if abs(self.vx) > self.MAX_VX:
+            self.vx = math.copysign(self.MAX_VX, self.vx)
+        if abs(self.vy) > self.MAX_VY:
+            self.vy = math.copysign(self.MAX_VY, self.vy)
+        dy = self.vy
+        dx = self.vx
+        self.vy += self.GRAVITY
+        self.rect = self.rect.move(dx, dy)
+        if self.rect.bottom > 200:
+            self.rect.bottom = 200
+            self.v_state = "standing"
+            self.vy = 0
+
         # change sprite
         if self.game.time_step % self.ANIMATION_INTERVAL == 0:
-            self.index = (self.index + 1) % len(self.RUNNING)
-            self.image = self.set_sprite(self.index)
+            if self.v_state == "jumping":
+                self.image = self.set_sprite(self.JUMP)
+            else:
+                if self.h_state == "running":
+                    self.index = (self.index + 1) % len(self.RUNNING)
+                    self.image = self.set_sprite(self.index)
+                elif self.h_state == "standing":
+                    self.image = self.set_sprite(self.STAND)
+
+            if self.facing == "left":
+                self.image = pygame.transform.flip(self.image, True, False)
 
     def set_sprite(self, index):
         if index not in self.loaded_sprites.keys():
