@@ -67,7 +67,6 @@ class Mario(pygame.sprite.Sprite):
         self.h_state = "running"
         self.facing = "right"
 
-
     def update(self, dt, game):
         last = self.rect.copy()
         if abs(self.vx) > self.MAX_VX:
@@ -80,6 +79,15 @@ class Mario(pygame.sprite.Sprite):
         self.rect = self.rect.move(dx, dy)
 
         new = self.rect
+        for box in game.tilemap.layers["coinboxs"]:
+            # TODO check only box that inside current viewport
+            if box.rect.colliderect(new) \
+                and new.centerx > box.rect.left and new.centerx < box.rect.right \
+                and last.top >= box.rect.bottom and new.top < box.rect.bottom:
+                box.got_hit()
+                new.top = box.rect.bottom
+                self.vy = 0
+
         for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
             if last.right <= cell.left and new.right > cell.left:
                 new.right = cell.left
@@ -90,8 +98,6 @@ class Mario(pygame.sprite.Sprite):
                 self.v_state = "resting"
                 self.vy = 0
             if last.top >= cell.bottom and new.top < cell.bottom:
-                print last
-                print new
                 new.top = cell.bottom
                 self.vy = 0
 

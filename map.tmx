@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="43" height="40" tilewidth="20" tileheight="14">
- <tileset firstgid="1" name="triggers" tilewidth="20" tileheight="14" spacing="1" margin="1">
-  <image source="images/triggers.png" trans="ffffff" width="64" height="16"/>
+ <tileset firstgid="1" name="map" tilewidth="20" tileheight="14">
+  <image source="images/map.png" width="240" height="154"/>
+ </tileset>
+ <tileset firstgid="133" name="triggers" tilewidth="20" tileheight="14">
+  <image source="images/triggers.png" width="60" height="14"/>
   <tile id="0">
    <properties>
     <property name="player" value="yes"/>
    </properties>
   </tile>
- </tileset>
- <tileset firstgid="4" name="map" tilewidth="20" tileheight="14">
-  <image source="images/map.png" width="240" height="154"/>
+  <tile id="2">
+   <properties>
+    <property name="coinbox" value="yes"/>
+    <property name="type" value="SECRET"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="river" width="43" height="40">
   <data encoding="base64" compression="zlib">
-   eJztzjEJAAAIAEETGcD+wUzgKAjewe8fAQAAAAAA8FcOXVRDF22+Nq8VA80=
+   eJztzjEJAAAIAEH7GMD+zUzgKAjewe8fAQAAAAAA8FcOXVRDF22+NnmBA5c=
   </data>
  </layer>
  <layer name="set" width="43" height="40">
   <data encoding="base64" compression="zlib">
-   eJztz0sOQDAURuEuhzCUYGoBVoExxhbvDoya0Nt63ETOl/wzrVPnAAAAAAAAAPxZaR2gVMsaWWsdolRYB0Sg9R1+a/fCPypZfkwjO/nWb+3vRIlBNgY2JZ5LuffKLFsCWxPPae6NefNm3PrEPV+17rYYPHA=
+   eJztz0sOQDAURuFuhjCUYGoBVoExxnbvDoya0Nt63ETOl/wzrVPnAAAAAAAAAPxZaR2gVMsaWWsdolRYB0Sg9R1+a/fCPypZfkwjO/nWb+3vRIlBNgY2JZ5LuffKLFsCWxPPae6NefNm3PrEPV+17geWOq4=
   </data>
  </layer>
- <objectgroup name="triggers" width="43" height="40" visible="0">
+ <objectgroup name="triggers" width="43" height="40">
   <object name="platform" x="20" y="532" width="200" height="28">
    <properties>
     <property name="blockers" value="tlrb"/>
@@ -32,7 +38,6 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="1" x="40" y="518"/>
   <object name="wall" x="0" y="0" width="20" height="560">
    <properties>
     <property name="blockers" value="tlbr"/>
@@ -44,6 +49,15 @@
    </properties>
   </object>
   <object name="wall" x="840" y="0" width="20" height="560">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="133" x="65" y="509"/>
+  <object gid="135" x="260" y="462"/>
+  <object gid="135" x="280" y="462"/>
+  <object gid="135" x="300" y="462"/>
+  <object name="platform" x="260" y="448" width="60" height="14">
    <properties>
     <property name="blockers" value="tlrb"/>
    </properties>

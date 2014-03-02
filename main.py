@@ -2,6 +2,7 @@ import sys
 import pygame
 
 import mario
+import coinbox
 import config
 import tmx
 
@@ -29,7 +30,13 @@ class MarioGame(object):
         self.sprites = tmx.SpriteLayer()
         self.my_mario = mario.Mario(self.sprites)
         self.my_mario.set_position(start_cell.px, start_cell.py)
-        self.tilemap.layers.append(self.sprites)
+
+        self.coinboxs = tmx.SpriteLayer()
+        for _coinbox in self.tilemap.layers['triggers'].find('coinbox'):
+            coinbox.CoinBox((_coinbox.px, _coinbox.py), coinbox.SECRET, self.coinboxs)
+
+        self.tilemap.layers.add_named(self.sprites, "sprites")
+        self.tilemap.layers.add_named(self.coinboxs, "coinboxs")
 
     def run(self):
         # main game loop
