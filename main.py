@@ -4,6 +4,7 @@ import pygame
 import mario
 import config
 import tmx
+import turtle
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
@@ -29,6 +30,10 @@ class MarioGame(object):
         self.sprites = tmx.SpriteLayer()
         self.my_mario = mario.Mario(self.sprites)
         self.my_mario.set_position(start_cell.px, start_cell.py)
+
+        for t in self.tilemap.layers['triggers'].find('enemy'):
+            turtle.Turtle((t.px, t.py), self.sprites)
+
         self.tilemap.layers.append(self.sprites)
 
     def run(self):

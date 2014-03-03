@@ -7,6 +7,16 @@
     <property name="player" value="yes"/>
    </properties>
   </tile>
+  <tile id="1">
+   <properties>
+    <property name="enemy" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="reverse" value="yes"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="4" name="map" tilewidth="20" tileheight="14">
   <image source="images/map.png" width="240" height="154"/>
@@ -32,7 +42,6 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="1" x="40" y="518"/>
   <object name="wall" x="0" y="0" width="20" height="560">
    <properties>
     <property name="blockers" value="tlbr"/>
@@ -48,5 +57,9 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
+  <object gid="2" x="282" y="484"/>
+  <object gid="1" x="77" y="512"/>
+  <object gid="3" x="422" y="504"/>
+  <object gid="3" x="202" y="506"/>
  </objectgroup>
 </map>
