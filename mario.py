@@ -110,7 +110,7 @@ class Mario(pygame.sprite.Sprite):
             else:
                 if self.h_state == "running":
                     self.index = (self.index + 1) % len(self.RUNNING)
-                    self.image = self.set_sprite(self.index)
+                    self.image = self.set_sprite(self.RUNNING[self.index])
                 elif self.h_state == "standing":
                     self.image = self.set_sprite(self.STAND)
 

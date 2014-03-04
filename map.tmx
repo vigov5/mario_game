@@ -27,7 +27,7 @@
    eJztz0sOQDAURuFuhjCUYGoBVoExxnbvDoya0Nt63ETOl/wzrVPnAAAAAAAAAPxZaR2gVMsaWWsdolRYB0Sg9R1+a/fCPypZfkwjO/nWb+3vRIlBNgY2JZ5LuffKLFsCWxPPae6NefNm3PrEPV+17geWOq4=
   </data>
  </layer>
- <objectgroup name="triggers" width="43" height="40">
+ <objectgroup name="triggers" width="43" height="40" visible="0">
   <object name="platform" x="20" y="532" width="200" height="28">
    <properties>
     <property name="blockers" value="tlrb"/>
@@ -62,5 +62,8 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
+  <object gid="135" x="560" y="462"/>
+  <object gid="135" x="580" y="462"/>
+  <object gid="135" x="600" y="462"/>
  </objectgroup>
 </map>

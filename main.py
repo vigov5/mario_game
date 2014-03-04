@@ -64,10 +64,16 @@ class MarioGame(object):
             self.screen.blit(text, textpos)
         # TODO: sprite draw
         self.tilemap.draw(screen)
+        for box in self.coinboxs:
+            box.draw_coin(screen)
+        #self.draw_debug(screen)
         self.pygame.display.flip()
 
+    def draw_debug(self, screen):
+        pygame.draw.rect(screen,  config.WHITE, pygame.Rect(260, 368, 20, 14))
+
     def update(self):
-        self.my_mario.update()
+        pass
 
     def handle(self, event):
         self.my_mario.handle(event)

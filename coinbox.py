@@ -1,6 +1,7 @@
 import os
 import pygame
 import config
+import coin
 
 SECRET = 1
 HIDE = 72
@@ -13,7 +14,8 @@ class CoinBox(pygame.sprite.Sprite):
     FRAME_HEIGHT = 14
     PADDING = 0
     img_file = "map.png"
-    count = 1
+    count = 10
+    my_coin = None
 
     def __init__(self, location, box_type, *groups):
         super(CoinBox, self).__init__(*groups)
@@ -23,15 +25,40 @@ class CoinBox(pygame.sprite.Sprite):
         self.image = self.set_sprite(self.box_type)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = location
+        self.group = groups
+        print self.rect
 
     def got_hit(self):
         if self.count:
-            self.count -= 1
-        else:
+            if self.my_coin == None:
+                my_pos = self.get_self_rect()
+                location = (my_pos.midtop[0] - 7, my_pos.top) 
+                self.my_coin = coin.Coin(location)
+                self.count -= 1
+
+        if not self.count:
             self.box_type = BLANK
+
+    def get_self_rect(self):
+        ox, oy = self.group[0].position
+        sx, sy = self.rect.topleft
+        return pygame.Rect(sx - ox, sy - oy, self.rect.width, self.rect.height)
+
+    def update_coin(self, dt, game):
+        self.my_coin.update(dt, game)
+        self.my_coin.rect.y -= dt * 200
+        if self.my_coin.rect.y < self.rect.y - 130:
+            self.my_coin.kill()
+            self.my_coin = None
+
+    def draw_coin(self, screen):
+        if self.my_coin != None:
+            self.my_coin.draw(screen)
 
     def update(self, dt, game):
         self.image = self.set_sprite(self.box_type)
+        if self.my_coin != None:
+            self.update_coin(dt, game)
         
     def set_sprite(self, index):
         if index not in self.loaded_sprites.keys():
