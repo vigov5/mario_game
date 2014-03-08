@@ -33,7 +33,9 @@ class MarioGame(object):
 
         self.coinboxs = tmx.SpriteLayer()
         for _coinbox in self.tilemap.layers['triggers'].find('coinbox'):
-            coinbox.CoinBox((_coinbox.px, _coinbox.py), coinbox.SECRET, self.coinboxs)
+            box_type = getattr(coinbox, _coinbox.properties.get("type", "SECRET"))
+            count = _coinbox.properties.get("count", 1)
+            coinbox.CoinBox(self, (_coinbox.px, _coinbox.py), box_type, count, self.coinboxs)
 
         self.tilemap.layers.add_named(self.sprites, "sprites")
         self.tilemap.layers.add_named(self.coinboxs, "coinboxs")
@@ -63,9 +65,9 @@ class MarioGame(object):
             textpos = text.get_rect(centerx=self.width/2)
             self.screen.blit(text, textpos)
         # TODO: sprite draw
-        self.tilemap.draw(screen)
         for box in self.coinboxs:
             box.draw_coin(screen)
+        self.tilemap.draw(screen)
         #self.draw_debug(screen)
         self.pygame.display.flip()
 

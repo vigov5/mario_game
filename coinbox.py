@@ -4,37 +4,58 @@ import config
 import coin
 
 SECRET = 1
-HIDE = 72
+HIDDEN = 72
 BLANK = 2
 
 class CoinBox(pygame.sprite.Sprite):
 
     loaded_sprites = {}
     FRAME_WIDTH = 20
+    COIN_WIDTH = 14
     FRAME_HEIGHT = 14
     PADDING = 0
     img_file = "map.png"
-    count = 10
+    kaching_file = "ka_ching.mp3"
+    count = 1
     my_coin = None
 
-    def __init__(self, location, box_type, *groups):
+    def __init__(self, game, location, box_type, count, *groups):
         super(CoinBox, self).__init__(*groups)
         img_path = os.path.join(config.image_path, self.img_file)
         self.sprite_imgs = pygame.image.load(img_path)
         self.box_type = box_type
+        self.count = count
         self.image = self.set_sprite(self.box_type)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = location
         self.group = groups
-        print self.rect
+        if self.box_type == SECRET:
+            self.set_blockers(game, "tlbr")
 
-    def got_hit(self):
+    def set_blockers(self, game, value):
+        cells = game.tilemap.layers['triggers'].get_in_region(
+            self.rect.left, self.rect.bottom, self.rect.right, self.rect.top
+        )
+        for cell in cells:
+            if getattr(cell, "tile"):
+                if value:
+                    cell.properties["blockers"] = value
+                else:
+                    del cell.properties["blockers"]
+
+    def got_hit(self, game):
         if self.count:
             if self.my_coin == None:
+                pygame.mixer.music.load(os.path.join(config.sound_path, self.kaching_file))
+                pygame.mixer.music.play()
                 my_pos = self.get_self_rect()
-                location = (my_pos.midtop[0] - 7, my_pos.top) 
+                if self.box_type == HIDDEN:
+                    self.set_blockers(game, "tlbr")
+                location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
                 self.my_coin = coin.Coin(location)
                 self.count -= 1
+        if self.box_type == HIDDEN:
+            self.box_type = BLANK
 
         if not self.count:
             self.box_type = BLANK
