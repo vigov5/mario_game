@@ -21,6 +21,14 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="143" name="triggers2x" tilewidth="40" tileheight="14">
+  <image source="images/triggers2x.png" width="80" height="14"/>
+  <tile id="0">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="river" width="43" height="40">
   <data encoding="base64" compression="zlib">
    eJztzjEJAAAIAEH7GMD+zUzgKAjewe8fAQAAAAAA8FcOXVRDF22+NnmBA5c=
@@ -78,5 +86,15 @@
   <object gid="136" x="540" y="392"/>
   <object gid="136" x="580" y="392"/>
   <object gid="136" x="620" y="392"/>
+  <object x="620" y="476" width="40" height="28">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="143" x="620" y="476"/>
+  <object gid="136" x="720" y="504"/>
+  <object gid="136" x="720" y="490"/>
+  <object gid="136" x="720" y="476"/>
+  <object gid="136" x="720" y="462"/>
  </objectgroup>
 </map>

@@ -11,7 +11,6 @@ class Brick(pygame.sprite.Sprite):
     TILE = [3, 4]
     img_file = "map.png"
     part_file = "part.png"
-    particles = [None, None, None, None]
     GRAVITY = 0.2
     PART_SIZE = 5
 
@@ -27,6 +26,7 @@ class Brick(pygame.sprite.Sprite):
         self.broken = False
         self.particles_vx = [-2, -2, 2, 2]
         self.particles_vy = [-6, -2, -2, -6]
+        self.particles = [None, None, None, None]
 
     def init_particles(self):
         my_pos = self.get_self_rect()
@@ -51,14 +51,14 @@ class Brick(pygame.sprite.Sprite):
             if getattr(cell, "tile"):
                 if value:
                     cell.properties["blockers"] = value
-                else:
+                elif cell.properties.get("blockers"):
                     del cell.properties["blockers"]
             break
 
     def update(self, dt, game):
         if self.broken:
             for i in range(len(self.particles)):
-                if self.particles[i]:
+                if self.particles[i] != None:
                     self.particles_vy[i] += self.GRAVITY
                     self.particles_vy[i] = min(20, self.particles_vy[i] + self.GRAVITY)
                     self.particles[i].rect.x += self.particles_vx[i]
@@ -77,9 +77,10 @@ class Brick(pygame.sprite.Sprite):
 
     def got_hit(self, game):
         self.set_blockers(game, None)
-        self.init_particles()
-        self.broken = True
-        self.image = self.set_sprite(config.BLANK_TILE)
+        if not self.broken:
+            self.init_particles()
+            self.broken = True
+            self.image = self.set_sprite(config.BLANK_TILE)
 
     def set_sprite(self, index):
         if index not in self.loaded_sprites.keys():

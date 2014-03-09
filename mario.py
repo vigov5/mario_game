@@ -97,16 +97,18 @@ class Mario(pygame.sprite.Sprite):
                 self.vy = 0
 
         for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
-            if last.bottom <= cell.top and new.bottom > cell.top:
+            if last.bottom <= cell.top and new.bottom > cell.top \
+                and not (last.left == cell.right or last.right == cell.left):
                 new.bottom = cell.top
                 self.v_state = "resting"
                 self.vy = 0
-            if last.top >= cell.bottom and new.top < cell.bottom:
+            if last.top >= cell.bottom and new.top < cell.bottom \
+                and not (last.left == cell.right or last.right == cell.left):
                 new.top = cell.bottom
                 self.vy = 0
-            if last.right <= cell.left and new.right > cell.left and new.bottom != cell.top:
+            if last.right <= cell.left and new.right > cell.left and last.bottom != cell.top:
                 new.right = cell.left
-            if last.left >= cell.right and new.left < cell.right and new.bottom != cell.top:
+            if last.left >= cell.right and new.left < cell.right and last.bottom != cell.top:
                 new.left = cell.right
 
         game.tilemap.set_focus(new.x, new.y)
