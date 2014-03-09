@@ -18,6 +18,8 @@ class CoinBox(pygame.sprite.Sprite):
     kaching_file = "ka_ching.mp3"
     count = 1
     my_coin = None
+    index = 0
+    ANIMATION_INTERVAL = 20
 
     def __init__(self, game, location, box_type, count, *groups):
         super(CoinBox, self).__init__(*groups)
@@ -34,7 +36,7 @@ class CoinBox(pygame.sprite.Sprite):
 
     def set_blockers(self, game, value):
         cells = game.tilemap.layers['triggers'].get_in_region(
-            self.rect.left, self.rect.bottom, self.rect.right, self.rect.top
+            self.rect.centerx, self.rect.centery, self.rect.centerx, self.rect.centery
         )
         for cell in cells:
             if getattr(cell, "tile"):
@@ -77,7 +79,13 @@ class CoinBox(pygame.sprite.Sprite):
             self.my_coin.draw(screen)
 
     def update(self, dt, game):
-        self.image = self.set_sprite(self.box_type)
+        frames = [0, 1]
+        if game.time_step % self.ANIMATION_INTERVAL == 0:
+            if self.box_type == SECRET:
+                self.index = (self.index + 1) % 2
+                self.image = self.set_sprite(frames[self.index])
+            else:
+                self.image = self.set_sprite(self.box_type)
         if self.my_coin != None:
             self.update_coin(dt, game)
         

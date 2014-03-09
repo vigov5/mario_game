@@ -3,6 +3,7 @@ import pygame
 
 import mario
 import coinbox
+import brick
 import config
 import tmx
 
@@ -37,8 +38,14 @@ class MarioGame(object):
             count = _coinbox.properties.get("count", 1)
             coinbox.CoinBox(self, (_coinbox.px, _coinbox.py), box_type, count, self.coinboxs)
 
+        self.bricks = tmx.SpriteLayer()
+        for _brick in self.tilemap.layers['triggers'].find('brick'):
+            brick.Brick(self, (_brick.px, _brick.py), self.bricks)
+
+
         self.tilemap.layers.add_named(self.sprites, "sprites")
         self.tilemap.layers.add_named(self.coinboxs, "coinboxs")
+        self.tilemap.layers.add_named(self.bricks, "bricks")
 
     def run(self):
         # main game loop
@@ -68,6 +75,8 @@ class MarioGame(object):
         for box in self.coinboxs:
             box.draw_coin(screen)
         self.tilemap.draw(screen)
+        for brick in self.bricks:
+            brick.draw_particles(screen)
         #self.draw_debug(screen)
         self.pygame.display.flip()
 

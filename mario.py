@@ -87,6 +87,14 @@ class Mario(pygame.sprite.Sprite):
                 box.got_hit(game)
                 new.top = box.rect.bottom
                 self.vy = 0
+        for brick in game.tilemap.layers["bricks"]:
+            # TODO check only brick that inside current viewport
+            if brick.rect.colliderect(new) \
+                and new.centerx > brick.rect.left and new.centerx < brick.rect.right \
+                and last.top >= brick.rect.bottom and new.top < brick.rect.bottom:
+                brick.got_hit(game)
+                new.top = brick.rect.bottom
+                self.vy = 0
 
         for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
             if last.bottom <= cell.top and new.bottom > cell.top:
