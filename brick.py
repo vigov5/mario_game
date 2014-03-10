@@ -22,7 +22,7 @@ class Brick(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = location
         self.group = groups
-        self.set_blockers(game, "tlbr")
+        self.set_blockers(game, "tlrb")
         self.broken = False
         self.particles_vx = [-2, -2, 2, 2]
         self.particles_vy = [-6, -2, -2, -6]
@@ -53,7 +53,6 @@ class Brick(pygame.sprite.Sprite):
                     cell.properties["blockers"] = value
                 elif cell.properties.get("blockers"):
                     del cell.properties["blockers"]
-            break
 
     def update(self, dt, game):
         if self.broken:
