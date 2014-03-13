@@ -33,6 +33,7 @@ class Mario(pygame.sprite.Sprite):
         self.v_state = "resting"
         self.h_state = "standing"
         self.facing = "right"
+        self.state = "normal"
 
     def handle(self, event):
         if event.type == pygame.KEYDOWN:
@@ -43,11 +44,15 @@ class Mario(pygame.sprite.Sprite):
                 self.move_right()
             elif event.key == pygame.K_LEFT:
                 self.move_left()
+            elif event.key == pygame.K_DOWN:
+                self.v_state = "crouching"
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or \
                 event.key == pygame.K_LEFT:
                 self.vx = 0
                 self.h_state = "standing"
+            elif event.key == pygame.K_DOWN:
+                self.v_state = "resting"
 
     def set_position(self, x, y):
         self.rect.x = x
@@ -69,48 +74,66 @@ class Mario(pygame.sprite.Sprite):
 
     def update(self, dt, game):
         last = self.rect.copy()
-        if abs(self.vx) > self.MAX_VX:
-            self.vx = math.copysign(self.MAX_VX, self.vx)
-        if abs(self.vy) > self.MAX_VY:
-            self.vy = math.copysign(self.MAX_VY, self.vy)
+        if self.state == "pipeing":
+            self.vy = 1
+            self.vx = 0
+        else:
+            self.vx = min(self.MAX_VX, self.vx)
+            self.vy = min(self.MAX_VY, self.vy)
         dy = self.vy
         dx = self.vx
         self.vy += self.GRAVITY
         self.rect = self.rect.move(dx, dy)
 
         new = self.rect
-        for box in game.tilemap.layers["coinboxs"]:
-            # TODO check only box that inside current viewport
-            if box.rect.colliderect(new) \
-                and new.centerx > box.rect.left and new.centerx < box.rect.right \
-                and last.top >= box.rect.bottom and new.top < box.rect.bottom:
-                box.got_hit(game)
-                new.top = box.rect.bottom
-                self.vy = 0
-        for brick in game.tilemap.layers["bricks"]:
-            # TODO check only brick that inside current viewport
-            if brick.rect.colliderect(new) \
-                and new.centerx > brick.rect.left and new.centerx < brick.rect.right \
-                and last.top >= brick.rect.bottom and new.top < brick.rect.bottom:
-                if not brick.broken:
-                    brick.got_hit(game)
-                    new.top = brick.rect.bottom
-                    self.vy = 0
+        if not self.state == "pipeing":
+            # collison with pipe
+            if self.v_state == "crouching":
+                for pipe in game.tilemap.layers["triggers"].collide(new, "pipe"):
+                    start_x = pipe.left + pipe.width/4
+                    end_x = pipe.right - pipe.width/4
+                    if last.bottom <= pipe.top and new.bottom > pipe.top \
+                        and new.centerx > start_x and new.centerx < end_x:
+                            # TODO do change scence and map
+                            self.state = "pipeing"
+                            self.pipe_y = pipe.top
 
-        for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
-            if last.bottom <= cell.top and new.bottom > cell.top \
-                and not (last.left == cell.right or last.right == cell.left):
-                new.bottom = cell.top
-                self.v_state = "resting"
-                self.vy = 0
-            if last.top >= cell.bottom and new.top < cell.bottom \
-                and not (last.left == cell.right or last.right == cell.left):
-                new.top = cell.bottom
-                self.vy = 0
-            if last.right <= cell.left and new.right > cell.left and last.bottom != cell.top:
-                new.right = cell.left
-            if last.left >= cell.right and new.left < cell.right and last.bottom != cell.top:
-                new.left = cell.right
+            for box in game.tilemap.layers["coinboxs"]:
+                # TODO check only box that inside current viewport
+                if box.rect.colliderect(new) \
+                    and new.centerx > box.rect.left and new.centerx < box.rect.right \
+                    and last.top >= box.rect.bottom and new.top < box.rect.bottom:
+                    box.got_hit(game)
+                    new.top = box.rect.bottom
+                    self.vy = 0
+            for brick in game.tilemap.layers["bricks"]:
+                # TODO check only brick that inside current viewport
+                if brick.rect.colliderect(new) \
+                    and new.centerx > brick.rect.left and new.centerx < brick.rect.right \
+                    and last.top >= brick.rect.bottom and new.top < brick.rect.bottom:
+                    if not brick.broken:
+                        brick.got_hit(game)
+                        new.top = brick.rect.bottom
+                        self.vy = 0
+
+            for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
+                if last.bottom <= cell.top and new.bottom > cell.top \
+                    and not (last.left == cell.right or last.right == cell.left):
+                    new.bottom = cell.top
+                    self.v_state = "resting"
+                    self.vy = 0
+                if last.top >= cell.bottom and new.top < cell.bottom \
+                    and not (last.left == cell.right or last.right == cell.left):
+                    new.top = cell.bottom
+                    self.vy = 0
+                if last.right <= cell.left and new.right > cell.left and last.bottom != cell.top:
+                    new.right = cell.left
+                if last.left >= cell.right and new.left < cell.right and last.bottom != cell.top:
+                    new.left = cell.right
+        else:
+            if new.bottom >= self.pipe_y + new.height:
+                self.state = "piped"
+                self.pipe_y = None
 
         game.tilemap.set_focus(new.x, new.y)
 

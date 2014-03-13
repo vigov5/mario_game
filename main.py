@@ -4,6 +4,7 @@ import pygame
 import mario
 import coinbox
 import brick
+import flower
 import config
 import tmx
 
@@ -25,11 +26,16 @@ class MarioGame(object):
         self.clock = self.pygame.time.Clock()
         self.time_step = 0
         # TODO: init sprite, tile,...
-        self.tilemap = tmx.load('map.tmx', self.screen.get_size())
+        self.init_map('map.tmx', True)
+        self.bg_color = config.SKY
+
+    def init_map(self, map_file, first_time):
+        self.tilemap = tmx.load(map_file, self.screen.get_size())
         start_cell = self.tilemap.layers['triggers'].find('player')[0]
 
-        self.sprites = tmx.SpriteLayer()
-        self.my_mario = mario.Mario(self.sprites)
+        if first_time:
+            self.sprites = tmx.SpriteLayer()
+            self.my_mario = mario.Mario(self.sprites)
         self.my_mario.set_position(start_cell.px, start_cell.py)
 
         self.coinboxs = tmx.SpriteLayer()
@@ -42,10 +48,21 @@ class MarioGame(object):
         for _brick in self.tilemap.layers['triggers'].find('brick'):
             brick.Brick(self, (_brick.px, _brick.py), self.bricks)
 
+        self.flowers = tmx.SpriteLayer()
+        for _flower in self.tilemap.layers['triggers'].find('flower'):
+            color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
+            flower.Flower(self, (_flower.px, _flower.py), color, self.flowers)
 
-        self.tilemap.layers.add_named(self.sprites, "sprites")
-        self.tilemap.layers.add_named(self.coinboxs, "coinboxs")
-        self.tilemap.layers.add_named(self.bricks, "bricks")
+        # layer order: background, midground + sprites, foreground
+        self.insert_layer(self.sprites, "sprites", 1)
+        self.insert_layer(self.coinboxs, "coinboxs", 2)
+        self.insert_layer(self.bricks, "bricks", 3)
+        self.insert_layer(self.flowers, "flowers", 4)
+
+    def insert_layer(self, sprites, layer_name, z_order):
+        self.tilemap.layers.add_named(sprites, layer_name)
+        self.tilemap.layers.remove(sprites)
+        self.tilemap.layers.insert(z_order, sprites)
 
     def run(self):
         # main game loop
@@ -60,12 +77,12 @@ class MarioGame(object):
                 # sprite handle event
                 self.handle(event)
 
-            self.tilemap.update(dt / 1000., self)
+            self.update(dt)
             # re-draw screen
             self.draw(self.screen)
 
     def draw(self, screen):
-        screen.fill(config.SKY)
+        screen.fill(self.bg_color)
         if pygame.font:
             font = pygame.font.Font(None, 36)
             text = font.render("Hello World !", 1, (255, 0, 0))
@@ -83,8 +100,13 @@ class MarioGame(object):
     def draw_debug(self, screen):
         pygame.draw.rect(screen,  config.WHITE, pygame.Rect(260, 368, 20, 14))
 
-    def update(self):
-        pass
+    def update(self, dt):
+        if self.my_mario.state == "piped":
+            self.init_map('underground1.tmx', False)
+            self.bg_color = config.BLACK
+            self.my_mario.state = "normal"
+
+        self.tilemap.update(dt / 1000., self)
 
     def handle(self, event):
         self.my_mario.handle(event)

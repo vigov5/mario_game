@@ -26,20 +26,34 @@
   <tile id="0">
    <properties>
     <property name="blockers" value="tlrb"/>
+    <property name="pipe" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="flower" value="yes"/>
    </properties>
   </tile>
  </tileset>
- <layer name="river" width="43" height="40">
+ <layer name="background" width="43" height="40">
+  <properties>
+   <property name="bg_color" value="SKY"/>
+  </properties>
   <data encoding="base64" compression="zlib">
-   eJztzjEJAAAIAEH7GMD+zUzgKAjewe8fAQAAAAAA8FcOXVRDF22+NnmBA5c=
+   eJztzrsJgEAQQMErRzH1E1qA/ffjxcLBGsiuMAMvf60BAAAAANQwZw8Erb2tt2ePBE3ZAy/8+fVMuYh5vl4pF3Utgyo6BlX05esN8lkFiQ==
   </data>
  </layer>
- <layer name="set" width="43" height="40">
+ <layer name="midground" width="43" height="40">
   <data encoding="base64" compression="zlib">
-   eJztzzsOQEAUhWEboKcnlBK0FmAVqFHbvVtMIQrz8BiR/0tOMsXcO2eCAAAAAAAAAMCfFb4LGKoktaTxXcRQ7ruAha93DSWROn+9ayxJ1PnYtX3gvVKSqZhId3fPunYXe/WSQZPRcc5l75lJMmuyOM6Z7LX58+q56x173uq6AcAJOy8=
+   eJztzzESQDAQQNFcht6RUKN2eynUkiyD4r2Z32V3NikBAAAAAAB/NOT6sxpdw9s7xtxUaA7ORfZeWXJroS04V7O35c/7x7c+seetWw8roDiU
   </data>
  </layer>
- <objectgroup name="triggers" width="43" height="40">
+ <layer name="foreground" width="43" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztzrENACAIAEEW0F73H1RGgIqY3CXffwQAAAAAAMxZ2Z6eKDrZnZ4o+ukVuh7TUwCC
+  </data>
+ </layer>
+ <objectgroup name="triggers" width="43" height="40" visible="0">
   <object name="platform" x="20" y="532" width="400" height="28">
    <properties>
     <property name="blockers" value="tlrb"/>
@@ -65,7 +79,7 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="133" x="60" y="504"/>
+  <object gid="133" x="620" y="433"/>
   <object gid="135" x="380" y="462">
    <properties>
     <property name="type" value="HIDDEN"/>
@@ -96,5 +110,10 @@
   <object gid="136" x="720" y="476"/>
   <object gid="136" x="720" y="462"/>
   <object gid="136" x="160" y="504"/>
+  <object gid="139" x="620" y="462">
+   <properties>
+    <property name="color" value="RED_FLOWER"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
