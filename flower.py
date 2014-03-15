@@ -12,7 +12,8 @@ class Flower(pygame.sprite.Sprite):
     FRAME_HEIGHT = 17
     PADDING = 1
     img_file = "flower.png"
-    ANIMATION_INTERVAL = 20
+    ANIMATION_INTERVAL = 40
+    direction = "down"
 
     def __init__(self, game, location, color, *groups):
         super(Flower, self).__init__(*groups)
@@ -25,6 +26,7 @@ class Flower(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = location
         self.rect.x += (40 - self.rect.width)/2
         self.rect.y -= 3
+        self.pivot_y = self.rect.y
         self.group = groups
 
     def get_self_rect(self):
@@ -33,6 +35,20 @@ class Flower(pygame.sprite.Sprite):
         return pygame.Rect(sx - ox, sy - oy, self.rect.width, self.rect.height)
 
     def update(self, dt, game):
+        if game.time_step % 4 == 0:
+            if self.direction == "down":
+                self.rect.y += 1
+            elif self.direction == "up":
+                self.rect.y -= 1
+
+        if self.rect.y >= self.pivot_y + self.rect.height and self.direction == "down":
+            self.rect.y = self.pivot_y + self.rect.height
+            self.direction = "up"
+        elif self.direction == "up" and self.rect.y <= self.pivot_y:
+            self.rect.y = self.pivot_y
+            if game.time_step % 240 == 0:
+                self.direction = "down"
+
         if game.time_step % self.ANIMATION_INTERVAL == 0:
             self.index = (self.index + 1) % 2
             if self.color == GREEN_FLOWER:

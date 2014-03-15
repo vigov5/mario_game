@@ -26,16 +26,18 @@ class MarioGame(object):
         self.clock = self.pygame.time.Clock()
         self.time_step = 0
         # TODO: init sprite, tile,...
-        self.init_map('map.tmx', True)
+        self.init_map('map.tmx', None, True)
         self.bg_color = config.SKY
 
-    def init_map(self, map_file, first_time):
+    def init_map(self, map_file, new_pos, first_time):
         self.tilemap = tmx.load(map_file, self.screen.get_size())
-        start_cell = self.tilemap.layers['triggers'].find('player')[0]
 
         if first_time:
             self.sprites = tmx.SpriteLayer()
             self.my_mario = mario.Mario(self.sprites)
+            start_cell = self.tilemap.layers['triggers'].find('player')[0]
+        else:
+            start_cell = self.tilemap.layers['triggers'].find(new_pos)[0]
         self.my_mario.set_position(start_cell.px, start_cell.py)
 
         self.coinboxs = tmx.SpriteLayer()
@@ -102,8 +104,13 @@ class MarioGame(object):
 
     def update(self, dt):
         if self.my_mario.state == "piped":
-            self.init_map('underground1.tmx', False)
-            self.bg_color = config.BLACK
+            next_map = self.my_mario.pipe_obj.properties.get("map")
+            new_pos = self.my_mario.pipe_obj.properties.get("next")
+            self.init_map(next_map + '.tmx', new_pos, False)
+            if "underground" in next_map:
+                self.bg_color = config.BLACK
+            else:
+                self.bg_color = config.SKY
             self.my_mario.state = "normal"
 
         self.tilemap.update(dt / 1000., self)

@@ -4,7 +4,7 @@
   <image source="images/map.png" width="240" height="154"/>
  </tileset>
  <tileset firstgid="133" name="triggers" tilewidth="20" tileheight="14">
-  <image source="images/triggers.png" width="100" height="14"/>
+  <image source="images/triggers.png" width="100" height="28"/>
   <tile id="0">
    <properties>
     <property name="player" value="yes"/>
@@ -13,6 +13,15 @@
   <tile id="3">
    <properties>
     <property name="brick" value="yes"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="143" name="triggers2x" tilewidth="40" tileheight="14">
+  <image source="images/triggers2x.png" width="80" height="14"/>
+  <tile id="0">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+    <property name="pipe" value="yes"/>
    </properties>
   </tile>
  </tileset>
@@ -60,17 +69,16 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object x="360" y="252" width="40" height="28">
+  <object x="360" y="266" width="40" height="14">
    <properties>
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object x="20" y="406" width="40" height="28">
+  <object x="20" y="420" width="40" height="14">
    <properties>
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="133" x="40" y="182"/>
   <object gid="136" x="140" y="224"/>
   <object gid="136" x="160" y="238"/>
   <object gid="136" x="180" y="252"/>
@@ -100,5 +108,22 @@
   <object gid="136" x="220" y="392"/>
   <object gid="136" x="120" y="392"/>
   <object gid="136" x="100" y="392"/>
+  <object gid="139" x="30" y="181">
+   <properties>
+    <property name="in1" value="yes"/>
+   </properties>
+  </object>
+  <object gid="143" x="20" y="420">
+   <properties>
+    <property name="map" value="map"/>
+    <property name="next" value="out2"/>
+   </properties>
+  </object>
+  <object gid="143" x="360" y="266">
+   <properties>
+    <property name="map" value="map"/>
+    <property name="next" value="out3"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

@@ -21,6 +21,12 @@ class Mario(pygame.sprite.Sprite):
     MAX_VX = 3
     MAX_VY = 20
 
+    v_state = "resting"
+    h_state = "standing"
+    facing = "right"
+    state = "normal"
+    pipe_obj = None
+
     def __init__(self, *groups):
         super(Mario, self).__init__(*groups)
         img_path = os.path.join(config.image_path, self.img_file)
@@ -30,10 +36,6 @@ class Mario(pygame.sprite.Sprite):
         self.pos = self.rect
         self.vx = 0
         self.vy = 0
-        self.v_state = "resting"
-        self.h_state = "standing"
-        self.facing = "right"
-        self.state = "normal"
 
     def handle(self, event):
         if event.type == pygame.KEYDOWN:
@@ -97,6 +99,8 @@ class Mario(pygame.sprite.Sprite):
                             # TODO do change scence and map
                             self.state = "pipeing"
                             self.pipe_y = pipe.top
+                            self.pipe_obj = pipe
+                            break
 
             for box in game.tilemap.layers["coinboxs"]:
                 # TODO check only box that inside current viewport
