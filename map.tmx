@@ -10,6 +10,11 @@
     <property name="player" value="yes"/>
    </properties>
   </tile>
+  <tile id="1">
+   <properties>
+    <property name="turtle" value=""/>
+   </properties>
+  </tile>
   <tile id="2">
    <properties>
     <property name="coinbox" value="yes"/>
@@ -18,6 +23,11 @@
   <tile id="3">
    <properties>
     <property name="brick" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="reverse" value="yes"/>
    </properties>
   </tile>
  </tileset>
@@ -166,5 +176,10 @@
     <property name="type" value="HIDDEN"/>
    </properties>
   </object>
+  <object gid="136" x="560" y="392"/>
+  <object gid="136" x="600" y="392"/>
+  <object gid="137" x="520" y="378"/>
+  <object gid="137" x="640" y="378"/>
+  <object gid="134" x="600" y="364"/>
  </objectgroup>
 </map>

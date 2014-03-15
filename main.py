@@ -7,6 +7,7 @@ import brick
 import flower
 import config
 import tmx
+import turtle
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
@@ -55,11 +56,16 @@ class MarioGame(object):
             color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
             flower.Flower(self, (_flower.px, _flower.py), color, self.flowers)
 
+        self.enemies = tmx.SpriteLayer()
+        for _turtle in self.tilemap.layers['triggers'].find('turtle'):
+            turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
+
         # layer order: background, midground + sprites, foreground
         self.insert_layer(self.sprites, "sprites", 1)
         self.insert_layer(self.coinboxs, "coinboxs", 2)
         self.insert_layer(self.bricks, "bricks", 3)
         self.insert_layer(self.flowers, "flowers", 4)
+        self.insert_layer(self.enemies, "enemies", 5)
 
     def insert_layer(self, sprites, layer_name, z_order):
         self.tilemap.layers.add_named(sprites, layer_name)
