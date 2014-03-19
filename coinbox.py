@@ -2,6 +2,7 @@ import os
 import pygame
 import config
 import coin
+import powerup
 
 SECRET = 1
 HIDDEN = 72
@@ -21,7 +22,7 @@ class CoinBox(pygame.sprite.Sprite):
     index = 0
     ANIMATION_INTERVAL = 20
 
-    def __init__(self, game, location, box_type, count, *groups):
+    def __init__(self, game, location, box_type, prize, count, *groups):
         super(CoinBox, self).__init__(*groups)
         img_path = os.path.join(config.image_path, self.img_file)
         self.sprite_imgs = pygame.image.load(img_path)
@@ -31,6 +32,7 @@ class CoinBox(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = location
         self.group = groups
+        self.prize = prize
         if self.box_type == SECRET:
             self.set_blockers(game, "tlbr")
 
@@ -46,20 +48,21 @@ class CoinBox(pygame.sprite.Sprite):
                     del cell.properties["blockers"]
 
     def got_hit(self, game):
-        if self.count:
-            if self.my_coin == None:
-                pygame.mixer.music.load(os.path.join(config.sound_path, self.kaching_file))
-                pygame.mixer.music.play()
-                my_pos = self.get_self_rect()
-                if self.box_type == HIDDEN:
-                    self.set_blockers(game, "tlbr")
-                location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
-                self.my_coin = coin.Coin(location)
-                self.count -= 1
-        if self.box_type == HIDDEN:
-            self.box_type = BLANK
-
-        if not self.count:
+        my_pos = self.get_self_rect()
+        if self.prize != None:
+            powerup.PowerUp(self.rect.topleft, self.prize, game.powerups)
+            self.prize = None
+        else:
+            if self.count:
+                if self.my_coin == None:
+                    pygame.mixer.music.load(os.path.join(config.sound_path, self.kaching_file))
+                    pygame.mixer.music.play()
+                    if self.box_type == HIDDEN:
+                        self.set_blockers(game, "tlbr")
+                    location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
+                    self.my_coin = coin.Coin(location)
+        if self.count: self.count -= 1
+        if self.box_type == HIDDEN or not self.count:
             self.box_type = BLANK
 
     def get_self_rect(self):

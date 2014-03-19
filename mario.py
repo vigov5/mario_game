@@ -1,6 +1,7 @@
 import os
 import math
 import pygame
+import powerup
 
 import config
 
@@ -9,12 +10,17 @@ class Mario(pygame.sprite.Sprite):
     FRAME_WIDTH = 20
     FRAME_HEIGHT = 19
     PADDING = 1
-    img_file = "small_mario.png"
+    s_file = "small_mario.png"
+    m_file = "medium_mario.png"
+    frame_sizes = {
+        "small": [(20, 19), (20, 19), (20, 19), (20, 19)],
+        "medium": [(19, 26), (19, 26), (20, 26), (20, 27)],
+    }
     STAND = 0
     RUNNING = [0, 1]
     JUMP = 3
     index = STAND
-    loaded_sprites = {}
+    loaded_sprites = {"small": {}, "medium": {}}
     ANIMATION_INTERVAL = 5
 
     GRAVITY = 0.4
@@ -26,11 +32,14 @@ class Mario(pygame.sprite.Sprite):
     facing = "right"
     state = "normal"
     pipe_obj = None
+    grow_size = "small"
 
     def __init__(self, *groups):
         super(Mario, self).__init__(*groups)
-        img_path = os.path.join(config.image_path, self.img_file)
-        self.sprite_imgs = pygame.image.load(img_path)
+        s_img_path = os.path.join(config.image_path, self.s_file)
+        self.sprite_imgs_s = pygame.image.load(s_img_path)
+        m_img_path = os.path.join(config.image_path, self.m_file)
+        self.sprite_imgs_m = pygame.image.load(m_img_path)
         self.image = self.set_sprite(self.index)
         self.rect = self.image.get_rect()
         self.pos = self.rect
@@ -48,6 +57,9 @@ class Mario(pygame.sprite.Sprite):
                 self.move_left()
             elif event.key == pygame.K_DOWN:
                 self.v_state = "crouching"
+            elif event.key == pygame.K_SPACE:
+                self.grow_size = "medium"
+                print "grow !"
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or \
                 event.key == pygame.K_LEFT:
@@ -76,6 +88,9 @@ class Mario(pygame.sprite.Sprite):
 
     def update(self, dt, game):
         last = self.rect.copy()
+        self.rect = self.image.get_rect()
+        self.rect.x = last.x
+        self.rect.y = last.y
         if self.state == "pipeing":
             self.vy = 1
             self.vx = 0
@@ -101,6 +116,13 @@ class Mario(pygame.sprite.Sprite):
                             self.pipe_y = pipe.top
                             self.pipe_obj = pipe
                             break
+            # collison with power up
+            for p in game.tilemap.layers["powerups"]:
+                if p.rect.colliderect(new) and p.state != "creating":
+                    if p.type == powerup.MUSHROOM:
+                        self.grow_size = "medium"
+                    p.kill()
+                    break
 
             for box in game.tilemap.layers["coinboxs"]:
                 # TODO check only box that inside current viewport
@@ -116,7 +138,8 @@ class Mario(pygame.sprite.Sprite):
                     and new.centerx > brick.rect.left and new.centerx < brick.rect.right \
                     and last.top >= brick.rect.bottom and new.top < brick.rect.bottom:
                     if not brick.broken:
-                        brick.got_hit(game)
+                        if self.grow_size != "small":
+                            brick.got_hit(game)
                         new.top = brick.rect.bottom
                         self.vy = 0
 
@@ -156,11 +179,18 @@ class Mario(pygame.sprite.Sprite):
                 self.image = pygame.transform.flip(self.image, True, False)
 
     def set_sprite(self, index):
-        if index not in self.loaded_sprites.keys():
-            left = (self.FRAME_WIDTH + self.PADDING) * index
-            rect = pygame.Rect(left, 0, self.FRAME_WIDTH, self.FRAME_HEIGHT)
-            _surface = pygame.Surface((self.FRAME_WIDTH, self.FRAME_HEIGHT), pygame.SRCALPHA)
-            _surface.blit(self.sprite_imgs, (0, 0), rect)
-            self.loaded_sprites[index] = _surface
+        if index not in self.loaded_sprites[self.grow_size].keys():
+            width = self.frame_sizes[self.grow_size][index][0]
+            height = self.frame_sizes[self.grow_size][index][1]
+            left = 0
+            for i in range(index):
+                left += self.frame_sizes[self.grow_size][i][0] + self.PADDING
+            rect = pygame.Rect(left, 0, width, height)
+            _surface = pygame.Surface((width, height), pygame.SRCALPHA)
+            if self.grow_size == "small":
+                _surface.blit(self.sprite_imgs_s, (0, 0), rect)
+            elif self.grow_size == "medium":
+                _surface.blit(self.sprite_imgs_m, (0, 0), rect)
+            self.loaded_sprites[self.grow_size][index] = _surface
 
-        return self.loaded_sprites[index]
+        return self.loaded_sprites[self.grow_size][index]

@@ -8,6 +8,7 @@ import flower
 import config
 import tmx
 import turtle
+import powerup
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
@@ -44,8 +45,11 @@ class MarioGame(object):
         self.coinboxs = tmx.SpriteLayer()
         for _coinbox in self.tilemap.layers['triggers'].find('coinbox'):
             box_type = getattr(coinbox, _coinbox.properties.get("type", "SECRET"))
+            prize = None
+            if _coinbox.properties.get("item"):
+                prize = getattr(powerup, _coinbox.properties.get("item"))
             count = _coinbox.properties.get("count", 1)
-            coinbox.CoinBox(self, (_coinbox.px, _coinbox.py), box_type, count, self.coinboxs)
+            coinbox.CoinBox(self, (_coinbox.px, _coinbox.py), box_type, prize, count, self.coinboxs)
 
         self.bricks = tmx.SpriteLayer()
         for _brick in self.tilemap.layers['triggers'].find('brick'):
@@ -60,12 +64,14 @@ class MarioGame(object):
         for _turtle in self.tilemap.layers['triggers'].find('turtle'):
             turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
 
+        self.powerups = tmx.SpriteLayer()
         # layer order: background, midground + sprites, foreground
         self.insert_layer(self.sprites, "sprites", 1)
-        self.insert_layer(self.coinboxs, "coinboxs", 2)
-        self.insert_layer(self.bricks, "bricks", 3)
-        self.insert_layer(self.flowers, "flowers", 4)
-        self.insert_layer(self.enemies, "enemies", 5)
+        self.insert_layer(self.powerups, "powerups", 2)
+        self.insert_layer(self.coinboxs, "coinboxs", 3)
+        self.insert_layer(self.bricks, "bricks", 4)
+        self.insert_layer(self.flowers, "flowers", 5)
+        self.insert_layer(self.enemies, "enemies", 6)
 
     def insert_layer(self, sprites, layer_name, z_order):
         self.tilemap.layers.add_named(sprites, layer_name)
@@ -106,7 +112,7 @@ class MarioGame(object):
         self.pygame.display.flip()
 
     def draw_debug(self, screen):
-        pygame.draw.rect(screen,  config.WHITE, pygame.Rect(260, 368, 20, 14))
+        pygame.draw.rect(screen,  config.WHITE, pygame.Rect(80, 396, 20, 14))
 
     def update(self, dt):
         if self.my_mario.state == "piped":

@@ -50,7 +50,7 @@
    <property name="bg_color" value="SKY"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt0LkNgDAQRFGXAyLlCCmAKoAY6D9jA6drI6T1pf+kyb/GOQAAAAAAUKtddvidmVtiLtnt92RuiaHVBq02Wmvt0+UExVpH2SSbU0YpvvzapcsJar11NS3S/WndTIvqMygr0aKsRJatL8xTG7E=
+   eJzt0LsNgDAMRdGMA6LlUzIAUwB1YP+OFGkdIyQnIbpHerWv7BwAAAAAAPirPeyIOwu3aHzYFXcXbtHQaoNWG6219vlykrTWMWwKm3NGCd78tcuXk9R662paJPvSupkWyXyhu5pBWI0WYTWybH0Axr4cHg==
   </data>
  </layer>
  <layer name="midground" width="43" height="40">
@@ -89,7 +89,7 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="133" x="46" y="521"/>
+  <object gid="133" x="40" y="504"/>
   <object gid="136" x="540" y="392"/>
   <object gid="136" x="580" y="392"/>
   <object gid="136" x="620" y="392"/>
@@ -133,15 +133,23 @@
     <property name="type" value="HIDDEN"/>
    </properties>
   </object>
-  <object gid="135" x="120" y="490"/>
-  <object gid="135" x="160" y="490"/>
+  <object gid="135" x="120" y="490">
+   <properties>
+    <property name="item" value="BAD_FUNGUS"/>
+   </properties>
+  </object>
+  <object gid="135" x="160" y="490">
+   <properties>
+    <property name="item" value="ONE_UP"/>
+   </properties>
+  </object>
   <object gid="136" x="140" y="490"/>
   <object gid="135" x="240" y="434"/>
   <object gid="135" x="160" y="406"/>
   <object gid="136" x="240" y="462"/>
   <object gid="136" x="260" y="462"/>
   <object gid="136" x="280" y="462"/>
-  <object gid="138" x="632" y="453">
+  <object gid="138" x="640" y="434">
    <properties>
     <property name="out2" value="yes"/>
    </properties>
@@ -156,7 +164,7 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="138" x="530" y="289">
+  <object gid="138" x="540" y="280">
    <properties>
     <property name="out3" value="yes"/>
    </properties>
@@ -181,5 +189,15 @@
   <object gid="137" x="520" y="378"/>
   <object gid="137" x="640" y="378"/>
   <object gid="134" x="600" y="364"/>
+  <object gid="135" x="80" y="490">
+   <properties>
+    <property name="item" value="MUSHROOM"/>
+   </properties>
+  </object>
+  <object gid="135" x="100" y="490">
+   <properties>
+    <property name="item" value="FLOWER"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
