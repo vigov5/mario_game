@@ -43,12 +43,6 @@ class Turtle(pygame.sprite.Sprite):
             self.vx = 1
         elif self.facing == "left":
             self.vx = -1
-        """
-        if abs(self.vx) > self.MAX_VX:
-            self.vx = math.copysign(self.MAX_VX, self.vx)
-        if abs(self.vy) > self.MAX_VY:
-            self.vy = math.copysign(self.MAX_VY, self.vy)
-        """
         dy = self.vy
         dx = self.vx
         self.vy += self.GRAVITY
@@ -62,18 +56,20 @@ class Turtle(pygame.sprite.Sprite):
 
         new = self.rect
         for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
-            if last.right <= cell.left and new.right > cell.left:
-                new.right = cell.left
-                self.facing = "left"
-            if last.left >= cell.right and new.left < cell.right:
-                new.left = cell.right
-                self.facing = "right"
-            if last.bottom <= cell.top and new.bottom > cell.top:
+            if last.bottom <= cell.top and new.bottom > cell.top \
+                and not (last.left == cell.right or last.right == cell.left):
                 new.bottom = cell.top
                 self.vy = 0
-            if last.top >= cell.bottom and new.top < cell.bottom:
+            if last.top >= cell.bottom and new.top < cell.bottom \
+                    and not (last.left == cell.right or last.right == cell.left):
                 new.top = cell.bottom
                 self.vy = 0
+            if last.right <= cell.left and new.right > cell.left and last.bottom != cell.top:
+                new.right = cell.left
+                self.facing = "left"
+            if last.left >= cell.right and new.left < cell.right and last.bottom != cell.top:
+                new.left = cell.right
+                self.facing = "right"
 
         # change sprite
         if game.time_step % self.ANIMATION_INTERVAL == 0:

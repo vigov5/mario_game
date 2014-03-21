@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="43" height="40" tilewidth="20" tileheight="14">
- <tileset firstgid="1" name="triggers" tilewidth="20" tileheight="14" spacing="1" margin="1">
-  <image source="images/triggers.png" trans="ffffff" width="64" height="16"/>
+ <tileset firstgid="1" name="map" tilewidth="20" tileheight="14">
+  <image source="images/map.png" width="240" height="154"/>
+ </tileset>
+ <tileset firstgid="133" name="triggers" tilewidth="20" tileheight="14">
+  <image source="images/triggers.png" width="100" height="28"/>
   <tile id="0">
    <properties>
     <property name="player" value="yes"/>
@@ -9,35 +12,64 @@
   </tile>
   <tile id="1">
    <properties>
-    <property name="enemy" value="yes"/>
+    <property name="turtle" value=""/>
    </properties>
   </tile>
   <tile id="2">
+   <properties>
+    <property name="coinbox" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="brick" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="4">
    <properties>
     <property name="reverse" value="yes"/>
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="4" name="map" tilewidth="20" tileheight="14">
-  <image source="images/map.png" width="240" height="154"/>
+ <tileset firstgid="143" name="triggers2x" tilewidth="40" tileheight="14">
+  <image source="images/triggers2x.png" width="80" height="14"/>
+  <tile id="0">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+    <property name="pipe" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="flower" value="yes"/>
+   </properties>
+  </tile>
  </tileset>
- <layer name="river" width="43" height="40">
+ <layer name="background" width="43" height="40">
+  <properties>
+   <property name="bg_color" value="SKY"/>
+  </properties>
   <data encoding="base64" compression="zlib">
-   eJztzjEJAAAIAEETGcD+wUzgKAjewe8fAQAAAAAA8FcOXVRDF22+Nq8VA80=
+   eJzt0LsNgDAMRdGMA6LlUzIAUwB1YP+OFGkdIyQnIbpHerWv7BwAAAAAAPirPeyIOwu3aHzYFXcXbtHQaoNWG6219vlykrTWMWwKm3NGCd78tcuXk9R662paJPvSupkWyXyhu5pBWI0WYTWybH0Axr4cHg==
   </data>
  </layer>
- <layer name="set" width="43" height="40">
+ <layer name="midground" width="43" height="40">
   <data encoding="base64" compression="zlib">
-   eJztz0sOQDAURuEuhzCUYGoBVoExxhbvDoya0Nt63ETOl/wzrVPnAAAAAAAAAPxZaR2gVMsaWWsdolRYB0Sg9R1+a/fCPypZfkwjO/nWb+3vRIlBNgY2JZ5LuffKLFsCWxPPae6NefNm3PrEPV+17rYYPHA=
+   eJzt1isOgDAQBUAuA54jARrQ3J6KCgSf8m1IZpLnui9bt0UBAAAA/9SEtDFd5l0AAN5Qh1QxKcoTb+9Y3mFbWbvPUuau9O7pQ4aDjBfnUnrP/HnKvOsTPV/tOgOV0joc
+  </data>
+ </layer>
+ <layer name="foreground" width="43" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzt1rEJACAMRUEX0F73H1QHsIhFCMId/P5BmrQGAADwr342qiOC5tmqjgjKanUvAODGj5Djp1Z4tQEhVAFR
   </data>
  </layer>
  <objectgroup name="triggers" width="43" height="40" visible="0">
-  <object name="platform" x="20" y="532" width="200" height="28">
+  <object name="platform" x="20" y="532" width="400" height="28">
    <properties>
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object name="platform" x="220" y="504" width="200" height="56">
+  <object name="platform" x="220" y="504" width="200" height="28">
    <properties>
     <property name="blockers" value="tlrb"/>
    </properties>
@@ -57,9 +89,115 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="2" x="282" y="484"/>
-  <object gid="1" x="77" y="512"/>
-  <object gid="3" x="422" y="504"/>
-  <object gid="3" x="202" y="506"/>
+  <object gid="133" x="40" y="504"/>
+  <object gid="136" x="540" y="392"/>
+  <object gid="136" x="580" y="392"/>
+  <object gid="136" x="620" y="392"/>
+  <object x="620" y="462" width="40" height="42">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="136" x="720" y="504"/>
+  <object gid="136" x="720" y="490"/>
+  <object gid="136" x="720" y="476"/>
+  <object gid="136" x="720" y="462"/>
+  <object gid="144" x="180" y="532">
+   <properties>
+    <property name="color" value="RED_FLOWER"/>
+   </properties>
+  </object>
+  <object name="platform" x="60" y="308" width="80" height="14">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="80" y="280" width="40" height="28">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="143" x="80" y="280">
+   <properties>
+    <property name="map" value="underground1"/>
+    <property name="next" value="in1"/>
+   </properties>
+  </object>
+  <object gid="135" x="360" y="406">
+   <properties>
+    <property name="type" value="HIDDEN"/>
+   </properties>
+  </object>
+  <object gid="135" x="360" y="462">
+   <properties>
+    <property name="type" value="HIDDEN"/>
+   </properties>
+  </object>
+  <object gid="135" x="120" y="490">
+   <properties>
+    <property name="item" value="BAD_FUNGUS"/>
+   </properties>
+  </object>
+  <object gid="135" x="160" y="490">
+   <properties>
+    <property name="item" value="ONE_UP"/>
+   </properties>
+  </object>
+  <object gid="136" x="140" y="490"/>
+  <object gid="135" x="240" y="434"/>
+  <object gid="135" x="160" y="406"/>
+  <object gid="136" x="240" y="462"/>
+  <object gid="136" x="260" y="462"/>
+  <object gid="136" x="280" y="462"/>
+  <object gid="138" x="640" y="434">
+   <properties>
+    <property name="out2" value="yes"/>
+   </properties>
+  </object>
+  <object name="platfrom" x="500" y="322" width="80" height="14">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="520" y="294" width="40" height="28">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="138" x="540" y="280">
+   <properties>
+    <property name="out3" value="yes"/>
+   </properties>
+  </object>
+  <object gid="135" x="300" y="364">
+   <properties>
+    <property name="type" value="HIDDEN"/>
+   </properties>
+  </object>
+  <object gid="135" x="240" y="336">
+   <properties>
+    <property name="type" value="HIDDEN"/>
+   </properties>
+  </object>
+  <object gid="135" x="160" y="322">
+   <properties>
+    <property name="type" value="HIDDEN"/>
+   </properties>
+  </object>
+  <object gid="136" x="560" y="392"/>
+  <object gid="136" x="600" y="392"/>
+  <object gid="137" x="520" y="378"/>
+  <object gid="137" x="640" y="378"/>
+  <object gid="134" x="600" y="364"/>
+  <object gid="135" x="80" y="490">
+   <properties>
+    <property name="item" value="MUSHROOM"/>
+   </properties>
+  </object>
+  <object gid="135" x="100" y="490">
+   <properties>
+    <property name="item" value="FLOWER"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

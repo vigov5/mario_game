@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="32" height="40" tilewidth="20" tileheight="14">
+ <tileset firstgid="1" name="map" tilewidth="20" tileheight="14">
+  <image source="images/map.png" width="240" height="154"/>
+ </tileset>
+ <tileset firstgid="133" name="triggers" tilewidth="20" tileheight="14">
+  <image source="images/triggers.png" width="100" height="28"/>
+  <tile id="0">
+   <properties>
+    <property name="player" value="yes"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="brick" value="yes"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="143" name="triggers2x" tilewidth="40" tileheight="14">
+  <image source="images/triggers2x.png" width="80" height="14"/>
+  <tile id="0">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+    <property name="pipe" value="yes"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="background" width="32" height="40">
+  <properties>
+   <property name="bg_color" value="BLACK"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt1NEJACAIQEGnq/afqBkEQ8J7EPh3kGCEJM1tPXq/+bt4zvqneM763f/P5/P5Xb77P3v//B5fkjq6qc5+fw==
+  </data>
+ </layer>
+ <layer name="midground" width="32" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzt1rEJADAIRUGr7D9yRkiaj4bcAzvhOrFKknpa4bnxU/H5fP50P3VvX/FT8fl8/mmn8/+V9G8bWAsDAQ==
+  </data>
+ </layer>
+ <layer name="foreground" width="32" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzt1LENACAQAsBfQHvdf1CdQRMpvEuoqaAK4F9jZwb7204P9gN30htOfxjACd8J8N4CUscA6w==
+  </data>
+ </layer>
+ <objectgroup name="triggers" width="32" height="40" visible="0">
+  <object x="0" y="434" width="480" height="126">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="0" y="0" width="480" height="140">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="0" y="140" width="20" height="294">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="460" y="140" width="20" height="294">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="20" y="280" width="380" height="28">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="360" y="266" width="40" height="14">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object x="20" y="420" width="40" height="14">
+   <properties>
+    <property name="blockers" value="tlrb"/>
+   </properties>
+  </object>
+  <object gid="136" x="140" y="224"/>
+  <object gid="136" x="160" y="238"/>
+  <object gid="136" x="180" y="252"/>
+  <object gid="136" x="200" y="266"/>
+  <object gid="136" x="220" y="280"/>
+  <object gid="136" x="220" y="182"/>
+  <object gid="136" x="240" y="196"/>
+  <object gid="136" x="260" y="210"/>
+  <object gid="136" x="280" y="224"/>
+  <object gid="136" x="300" y="238"/>
+  <object gid="136" x="320" y="252"/>
+  <object gid="136" x="340" y="252"/>
+  <object gid="136" x="440" y="336"/>
+  <object gid="136" x="420" y="350"/>
+  <object gid="136" x="400" y="364"/>
+  <object gid="136" x="380" y="378"/>
+  <object gid="136" x="340" y="406"/>
+  <object gid="136" x="360" y="392"/>
+  <object gid="136" x="320" y="420"/>
+  <object gid="136" x="300" y="434"/>
+  <object gid="136" x="160" y="392"/>
+  <object gid="136" x="140" y="392"/>
+  <object gid="136" x="180" y="392"/>
+  <object gid="136" x="200" y="392"/>
+  <object gid="136" x="240" y="392"/>
+  <object gid="136" x="260" y="392"/>
+  <object gid="136" x="220" y="392"/>
+  <object gid="136" x="120" y="392"/>
+  <object gid="136" x="100" y="392"/>
+  <object gid="139" x="30" y="181">
+   <properties>
+    <property name="in1" value="yes"/>
+   </properties>
+  </object>
+  <object gid="143" x="20" y="420">
+   <properties>
+    <property name="map" value="map"/>
+    <property name="next" value="out2"/>
+   </properties>
+  </object>
+  <object gid="143" x="360" y="266">
+   <properties>
+    <property name="map" value="map"/>
+    <property name="next" value="out3"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

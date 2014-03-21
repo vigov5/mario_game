@@ -2,9 +2,13 @@ import sys
 import pygame
 
 import mario
+import coinbox
+import brick
+import flower
 import config
 import tmx
 import turtle
+import powerup
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
@@ -24,17 +28,55 @@ class MarioGame(object):
         self.clock = self.pygame.time.Clock()
         self.time_step = 0
         # TODO: init sprite, tile,...
-        self.tilemap = tmx.load('map.tmx', self.screen.get_size())
-        start_cell = self.tilemap.layers['triggers'].find('player')[0]
+        self.init_map('map.tmx', None, True)
+        self.bg_color = config.SKY
 
-        self.sprites = tmx.SpriteLayer()
-        self.my_mario = mario.Mario(self.sprites)
+    def init_map(self, map_file, new_pos, first_time):
+        self.tilemap = tmx.load(map_file, self.screen.get_size())
+
+        if first_time:
+            self.sprites = tmx.SpriteLayer()
+            self.my_mario = mario.Mario(self.sprites)
+            start_cell = self.tilemap.layers['triggers'].find('player')[0]
+        else:
+            start_cell = self.tilemap.layers['triggers'].find(new_pos)[0]
         self.my_mario.set_position(start_cell.px, start_cell.py)
 
-        for t in self.tilemap.layers['triggers'].find('enemy'):
-            turtle.Turtle((t.px, t.py), self.sprites)
+        self.coinboxs = tmx.SpriteLayer()
+        for _coinbox in self.tilemap.layers['triggers'].find('coinbox'):
+            box_type = getattr(coinbox, _coinbox.properties.get("type", "SECRET"))
+            prize = None
+            if _coinbox.properties.get("item"):
+                prize = getattr(powerup, _coinbox.properties.get("item"))
+            count = _coinbox.properties.get("count", 1)
+            coinbox.CoinBox(self, (_coinbox.px, _coinbox.py), box_type, prize, count, self.coinboxs)
 
-        self.tilemap.layers.append(self.sprites)
+        self.bricks = tmx.SpriteLayer()
+        for _brick in self.tilemap.layers['triggers'].find('brick'):
+            brick.Brick(self, (_brick.px, _brick.py), self.bricks)
+
+        self.flowers = tmx.SpriteLayer()
+        for _flower in self.tilemap.layers['triggers'].find('flower'):
+            color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
+            flower.Flower(self, (_flower.px, _flower.py), color, self.flowers)
+
+        self.enemies = tmx.SpriteLayer()
+        for _turtle in self.tilemap.layers['triggers'].find('turtle'):
+            turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
+
+        self.powerups = tmx.SpriteLayer()
+        # layer order: background, midground + sprites, foreground
+        self.insert_layer(self.sprites, "sprites", 1)
+        self.insert_layer(self.powerups, "powerups", 2)
+        self.insert_layer(self.coinboxs, "coinboxs", 3)
+        self.insert_layer(self.bricks, "bricks", 4)
+        self.insert_layer(self.flowers, "flowers", 5)
+        self.insert_layer(self.enemies, "enemies", 6)
+
+    def insert_layer(self, sprites, layer_name, z_order):
+        self.tilemap.layers.add_named(sprites, layer_name)
+        self.tilemap.layers.remove(sprites)
+        self.tilemap.layers.insert(z_order, sprites)
 
     def run(self):
         # main game loop
@@ -49,23 +91,41 @@ class MarioGame(object):
                 # sprite handle event
                 self.handle(event)
 
-            self.tilemap.update(dt / 1000., self)
+            self.update(dt)
             # re-draw screen
             self.draw(self.screen)
 
     def draw(self, screen):
-        screen.fill(config.SKY)
+        screen.fill(self.bg_color)
         if pygame.font:
             font = pygame.font.Font(None, 36)
             text = font.render("Hello World !", 1, (255, 0, 0))
             textpos = text.get_rect(centerx=self.width/2)
             self.screen.blit(text, textpos)
         # TODO: sprite draw
+        for box in self.coinboxs:
+            box.draw_coin(screen)
         self.tilemap.draw(screen)
+        for brick in self.bricks:
+            brick.draw_particles(screen)
+        #self.draw_debug(screen)
         self.pygame.display.flip()
 
-    def update(self):
-        self.my_mario.update()
+    def draw_debug(self, screen):
+        pygame.draw.rect(screen,  config.WHITE, pygame.Rect(80, 396, 20, 14))
+
+    def update(self, dt):
+        if self.my_mario.state == "piped":
+            next_map = self.my_mario.pipe_obj.properties.get("map")
+            new_pos = self.my_mario.pipe_obj.properties.get("next")
+            self.init_map(next_map + '.tmx', new_pos, False)
+            if "underground" in next_map:
+                self.bg_color = config.BLACK
+            else:
+                self.bg_color = config.SKY
+            self.my_mario.state = "normal"
+
+        self.tilemap.update(dt / 1000., self)
 
     def handle(self, event):
         self.my_mario.handle(event)
