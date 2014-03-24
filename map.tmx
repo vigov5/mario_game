@@ -27,7 +27,7 @@
   </tile>
   <tile id="4">
    <properties>
-    <property name="reverse" value="yes"/>
+    <property name="v_reverse" value="yes"/>
    </properties>
   </tile>
  </tileset>
@@ -186,8 +186,6 @@
   </object>
   <object gid="136" x="560" y="392"/>
   <object gid="136" x="600" y="392"/>
-  <object gid="137" x="520" y="378"/>
-  <object gid="137" x="640" y="378"/>
   <object gid="134" x="600" y="364"/>
   <object gid="135" x="80" y="490">
    <properties>
@@ -197,6 +195,11 @@
   <object gid="135" x="100" y="490">
    <properties>
     <property name="item" value="FLOWER"/>
+   </properties>
+  </object>
+  <object gid="144" x="500" y="504">
+   <properties>
+    <property name="color" value="GREEN_FLOWER"/>
    </properties>
   </object>
  </objectgroup>

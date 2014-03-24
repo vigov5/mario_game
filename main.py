@@ -36,11 +36,11 @@ class MarioGame(object):
 
         if first_time:
             self.sprites = tmx.SpriteLayer()
-            self.my_mario = mario.Mario(self.sprites)
             start_cell = self.tilemap.layers['triggers'].find('player')[0]
+            self.my_mario = mario.Mario((100, 100), self.sprites)
         else:
             start_cell = self.tilemap.layers['triggers'].find(new_pos)[0]
-        self.my_mario.set_position(start_cell.px, start_cell.py)
+        self.my_mario.rect.topleft = (start_cell.px, start_cell.py)
 
         self.coinboxs = tmx.SpriteLayer()
         for _coinbox in self.tilemap.layers['triggers'].find('coinbox'):

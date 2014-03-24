@@ -24,7 +24,7 @@ class Coin(pygame.sprite.Sprite):
         self.sprite_imgs = pygame.image.load(img_path)
         self.image = self.set_sprite(self.index)
         self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = location
+        self.rect.topleft = location
 
     def update(self, dt, game):
         if game.time_step % self.ANIMATION_INTERVAL == 0:
