@@ -1,50 +1,37 @@
-import os
-import math
 import pygame
 import powerup
 
-import config
+import sprite_base
 
-class Mario(pygame.sprite.Sprite):
+class Mario(sprite_base.SpriteBase):
 
-    FRAME_WIDTH = 20
-    FRAME_HEIGHT = 19
     PADDING = 1
-    s_file = "small_mario.png"
-    m_file = "medium_mario.png"
-    frame_sizes = {
+    sprite_imgs = {
+        "small": "small_mario.png",
+        "medium" : "medium_mario.png"
+    }
+    cell_sizes = {
         "small": [(20, 19), (20, 19), (20, 19), (20, 19)],
         "medium": [(19, 26), (19, 26), (20, 26), (20, 27)],
     }
+
     STAND = 0
     RUNNING = [0, 1]
     JUMP = 3
-    index = STAND
-    loaded_sprites = {"small": {}, "medium": {}}
     ANIMATION_INTERVAL = 5
+    frames_sizes = None
 
-    GRAVITY = 0.4
-    MAX_VX = 3
-    MAX_VY = 20
-
-    v_state = "resting"
-    h_state = "standing"
-    facing = "right"
     state = "normal"
     pipe_obj = None
     grow_size = "small"
 
-    def __init__(self, *groups):
-        super(Mario, self).__init__(*groups)
-        s_img_path = os.path.join(config.image_path, self.s_file)
-        self.sprite_imgs_s = pygame.image.load(s_img_path)
-        m_img_path = os.path.join(config.image_path, self.m_file)
-        self.sprite_imgs_m = pygame.image.load(m_img_path)
-        self.image = self.set_sprite(self.index)
-        self.rect = self.image.get_rect()
-        self.pos = self.rect
-        self.vx = 0
-        self.vy = 0
+    def __init__(self, location, *groups):
+        self.grow_up("small")
+        self.FRAMES = self.RUNNING
+        self.frame_index = self.FRAMES[0]
+        self.frames_sizes = self.cell_sizes[self.grow_size]
+        super(Mario, self).__init__(self.STAND, location, groups)
+
 
     def handle(self, event):
         if event.type == pygame.KEYDOWN:
@@ -57,9 +44,6 @@ class Mario(pygame.sprite.Sprite):
                 self.move_left()
             elif event.key == pygame.K_DOWN:
                 self.v_state = "crouching"
-            elif event.key == pygame.K_SPACE:
-                self.grow_size = "medium"
-                print "grow !"
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_RIGHT or \
                 event.key == pygame.K_LEFT:
@@ -68,23 +52,28 @@ class Mario(pygame.sprite.Sprite):
             elif event.key == pygame.K_DOWN:
                 self.v_state = "resting"
 
-    def set_position(self, x, y):
-        self.rect.x = x
-        self.rect.y = y
 
     def jump(self):
         self.vy = -9
         self.v_state = "jumping"
 
+
     def move_left(self):
         self.vx = -2.5
         self.h_state = "running"
-        self.facing = "left"
+        self.v_facing = "left"
+
 
     def move_right(self):
         self.vx = 2.5
         self.h_state = "running"
-        self.facing = "right"
+        self.v_facing = "right"
+
+
+    def grow_up(self, size):
+        self.grow_size = size
+        self.img_file = self.sprite_imgs[self.grow_size]
+
 
     def update(self, dt, game):
         last = self.rect.copy()
@@ -120,7 +109,7 @@ class Mario(pygame.sprite.Sprite):
             for p in game.tilemap.layers["powerups"]:
                 if p.rect.colliderect(new) and p.state != "creating":
                     if p.type == powerup.MUSHROOM:
-                        self.grow_size = "medium"
+                        self.grow_up("medium")
                     p.kill()
                     break
 
@@ -143,20 +132,7 @@ class Mario(pygame.sprite.Sprite):
                         new.top = brick.rect.bottom
                         self.vy = 0
 
-            for cell in game.tilemap.layers['triggers'].collide(new, 'blockers'):
-                if last.bottom <= cell.top and new.bottom > cell.top \
-                    and not (last.left == cell.right or last.right == cell.left):
-                    new.bottom = cell.top
-                    self.v_state = "resting"
-                    self.vy = 0
-                if last.top >= cell.bottom and new.top < cell.bottom \
-                    and not (last.left == cell.right or last.right == cell.left):
-                    new.top = cell.bottom
-                    self.vy = 0
-                if last.right <= cell.left and new.right > cell.left and last.bottom != cell.top:
-                    new.right = cell.left
-                if last.left >= cell.right and new.left < cell.right and last.bottom != cell.top:
-                    new.left = cell.right
+            self.collision_with_platform(last, new, game)
         else:
             if new.bottom >= self.pipe_y + new.height:
                 self.state = "piped"
@@ -165,32 +141,15 @@ class Mario(pygame.sprite.Sprite):
         game.tilemap.set_focus(new.x, new.y)
 
         # change sprite
-        if game.time_step % self.ANIMATION_INTERVAL == 0:
-            if self.v_state == "jumping":
-                self.image = self.set_sprite(self.JUMP)
-            else:
-                if self.h_state == "running":
-                    self.index = (self.index + 1) % len(self.RUNNING)
-                    self.image = self.set_sprite(self.RUNNING[self.index])
-                elif self.h_state == "standing":
-                    self.image = self.set_sprite(self.STAND)
+        self.frames_sizes = self.cell_sizes[self.grow_size]
+        if self.v_state == "jumping":
+            self.set_sprite(self.JUMP)
+        else:
+            if self.h_state == "standing":
+                self.set_sprite(self.STAND)
+            elif self.h_state == "running":
+                super(Mario, self).update(dt, game)
 
-            if self.facing == "left":
-                self.image = pygame.transform.flip(self.image, True, False)
 
-    def set_sprite(self, index):
-        if index not in self.loaded_sprites[self.grow_size].keys():
-            width = self.frame_sizes[self.grow_size][index][0]
-            height = self.frame_sizes[self.grow_size][index][1]
-            left = 0
-            for i in range(index):
-                left += self.frame_sizes[self.grow_size][i][0] + self.PADDING
-            rect = pygame.Rect(left, 0, width, height)
-            _surface = pygame.Surface((width, height), pygame.SRCALPHA)
-            if self.grow_size == "small":
-                _surface.blit(self.sprite_imgs_s, (0, 0), rect)
-            elif self.grow_size == "medium":
-                _surface.blit(self.sprite_imgs_m, (0, 0), rect)
-            self.loaded_sprites[self.grow_size][index] = _surface
-
-        return self.loaded_sprites[self.grow_size][index]
+    def hit_platform_from_bottom(self, last, new, game):
+        self.v_state = "resting"
