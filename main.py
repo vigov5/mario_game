@@ -17,6 +17,7 @@ class MarioGame(object):
 
     width = 640
     height = 480
+    game_over = False
 
     def __init__(self):
         self.pygame = pygame
@@ -55,23 +56,21 @@ class MarioGame(object):
         for _brick in self.tilemap.layers['triggers'].find('brick'):
             brick.Brick(self, (_brick.px, _brick.py), self.bricks)
 
-        self.flowers = tmx.SpriteLayer()
-        for _flower in self.tilemap.layers['triggers'].find('flower'):
-            color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
-            flower.Flower(self, (_flower.px, _flower.py), color, self.flowers)
-
         self.enemies = tmx.SpriteLayer()
         for _turtle in self.tilemap.layers['triggers'].find('turtle'):
             turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
+        for _flower in self.tilemap.layers['triggers'].find('flower'):
+            color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
+            flower.Flower(self, (_flower.px, _flower.py), color, self.enemies)
 
         self.powerups = tmx.SpriteLayer()
         # layer order: background, midground + sprites, foreground
-        self.insert_layer(self.sprites, "sprites", 1)
-        self.insert_layer(self.powerups, "powerups", 2)
-        self.insert_layer(self.coinboxs, "coinboxs", 3)
-        self.insert_layer(self.bricks, "bricks", 4)
-        self.insert_layer(self.flowers, "flowers", 5)
-        self.insert_layer(self.enemies, "enemies", 6)
+        self.insert_layer(self.powerups, "powerups", 1)
+        self.insert_layer(self.coinboxs, "coinboxs", 2)
+        self.insert_layer(self.bricks, "bricks", 3)
+        self.insert_layer(self.enemies, "enemies", 4)
+        self.insert_layer(self.sprites, "sprites", 5)
+
 
     def insert_layer(self, sprites, layer_name, z_order):
         self.tilemap.layers.add_named(sprites, layer_name)
@@ -86,7 +85,8 @@ class MarioGame(object):
             self.time_step += 1
             # enumerate event
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT \
+                    or event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     sys.exit(0)
                 # sprite handle event
                 self.handle(event)
@@ -97,18 +97,18 @@ class MarioGame(object):
 
     def draw(self, screen):
         screen.fill(self.bg_color)
-        if pygame.font:
-            font = pygame.font.Font(None, 36)
-            text = font.render("Hello World !", 1, (255, 0, 0))
-            textpos = text.get_rect(centerx=self.width/2)
-            self.screen.blit(text, textpos)
-        # TODO: sprite draw
-        for box in self.coinboxs:
-            box.draw_coin(screen)
-        self.tilemap.draw(screen)
-        for brick in self.bricks:
-            brick.draw_particles(screen)
-        #self.draw_debug(screen)
+        if not self.game_over:
+            for box in self.coinboxs:
+                box.draw_coin(screen)
+            self.tilemap.draw(screen)
+            for brick in self.bricks:
+                brick.draw_particles(screen)
+            #self.draw_debug(screen)
+            if self.my_mario.state == "dying":
+                self.draw_dying_screen(screen)
+        else:
+            self.draw_gameover_screen(screen)
+
         self.pygame.display.flip()
 
     def draw_debug(self, screen):
@@ -127,8 +127,33 @@ class MarioGame(object):
 
         self.tilemap.update(dt / 1000., self)
 
+
     def handle(self, event):
         self.my_mario.handle(event)
+
+
+    def draw_gameover_screen(self, screen):
+        screen.fill(config.BLACK)
+        if pygame.font:
+            over_text = pygame.font.Font(None, 36).render("GAME OVER !!!", 1, (255, 255, 255))
+            quit_text = pygame.font.Font(None, 24).render("Press 'q' to get out of here.", 1, (255, 255, 255))
+            over_textpos = over_text.get_rect(centerx=self.width/2, centery=self.height/2 - 36)
+            quit_textpos = quit_text.get_rect(centerx=self.width/2, centery=self.height/2)
+            self.screen.blit(over_text, over_textpos)
+            self.screen.blit(quit_text, quit_textpos)
+
+
+    def draw_dying_screen(self, screen):
+        screen.fill((128, 128, 128, 128), None, pygame.BLEND_RGBA_MULT)
+        if pygame.font:
+            font = pygame.font.Font(None, 24)
+            dead_text = font.render("You're dead.", 1, (255, 255, 255))
+            again_text = font.render("Press ENTER to save the world one again !", 1, (255, 255, 255))
+            dead_textpos = dead_text.get_rect(centerx=self.width/2, centery=self.height/2 - 36)
+            again_textpos = again_text.get_rect(centerx=self.width/2, centery=self.height/2)
+            self.screen.blit(dead_text, dead_textpos)
+            self.screen.blit(again_text, again_textpos)
+
 
 if __name__ == '__main__':
     g = MarioGame()
