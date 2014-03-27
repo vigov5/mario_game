@@ -1,5 +1,6 @@
 import pygame
 import powerup
+import turtle
 
 import sprite_base
 
@@ -53,21 +54,21 @@ class Mario(sprite_base.SpriteBase):
                 self.v_state = "resting"
 
 
-    def jump(self):
-        self.vy = -9
+    def jump(self, speed=9):
+        self.vy = -1*speed
         self.v_state = "jumping"
 
 
     def move_left(self):
         self.vx = -2.5
         self.h_state = "running"
-        self.v_facing = "left"
+        self.h_facing = "left"
 
 
     def move_right(self):
         self.vx = 2.5
         self.h_state = "running"
-        self.v_facing = "right"
+        self.h_facing = "right"
 
 
     def grow_up(self, size):
@@ -131,6 +132,26 @@ class Mario(sprite_base.SpriteBase):
                             brick.got_hit(game)
                         new.top = brick.rect.bottom
                         self.vy = 0
+            for enemy in game.tilemap.layers["enemies"]:
+                # TODO check only enemy that near mario
+                if enemy.rect.colliderect(new) and isinstance(enemy, turtle.Turtle):
+                    if last.bottom <= enemy.rect.top and new.bottom >= enemy.rect.top:
+                        self.jump(12)
+                        if enemy.state == "normal":
+                            enemy.change_to_shell()
+                        elif enemy.state == "shell":
+                            if enemy.h_state == "running":
+                                enemy.change_to_shell()
+                            else:
+                                enemy.do_shelling(self)
+                    elif enemy.state == "shell" and enemy.h_state == "standing":
+                        enemy.h_state = "running"
+                        if self.rect.left < enemy.rect.left:
+                            enemy.h_facing = "right"
+                            enemy.vx = 5
+                        else:
+                            enemy.h_facing = "left"
+                            enemy.vx = -5
 
             self.collision_with_platform(last, new, game)
         else:

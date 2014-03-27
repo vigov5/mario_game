@@ -89,7 +89,7 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="133" x="40" y="504"/>
+  <object gid="133" x="40" y="448"/>
   <object gid="136" x="540" y="392"/>
   <object gid="136" x="580" y="392"/>
   <object gid="136" x="620" y="392"/>
@@ -102,7 +102,7 @@
   <object gid="136" x="720" y="490"/>
   <object gid="136" x="720" y="476"/>
   <object gid="136" x="720" y="462"/>
-  <object gid="144" x="180" y="532">
+  <object gid="144" x="380" y="504">
    <properties>
     <property name="color" value="RED_FLOWER"/>
    </properties>
@@ -133,17 +133,17 @@
     <property name="type" value="HIDDEN"/>
    </properties>
   </object>
-  <object gid="135" x="120" y="490">
+  <object gid="135" x="120" y="434">
    <properties>
     <property name="item" value="BAD_FUNGUS"/>
    </properties>
   </object>
-  <object gid="135" x="160" y="490">
+  <object gid="135" x="160" y="434">
    <properties>
     <property name="item" value="ONE_UP"/>
    </properties>
   </object>
-  <object gid="136" x="140" y="490"/>
+  <object gid="136" x="140" y="434"/>
   <object gid="135" x="240" y="434"/>
   <object gid="135" x="160" y="406"/>
   <object gid="136" x="240" y="462"/>
@@ -187,12 +187,12 @@
   <object gid="136" x="560" y="392"/>
   <object gid="136" x="600" y="392"/>
   <object gid="134" x="600" y="364"/>
-  <object gid="135" x="80" y="490">
+  <object gid="135" x="80" y="434">
    <properties>
     <property name="item" value="MUSHROOM"/>
    </properties>
   </object>
-  <object gid="135" x="100" y="490">
+  <object gid="135" x="100" y="434">
    <properties>
     <property name="item" value="FLOWER"/>
    </properties>
@@ -202,5 +202,28 @@
     <property name="color" value="GREEN_FLOWER"/>
    </properties>
   </object>
+  <object gid="134" x="60" y="462"/>
+  <object gid="136" x="140" y="532"/>
+  <object gid="136" x="160" y="532"/>
+  <object gid="136" x="180" y="532"/>
+  <object gid="136" x="200" y="532"/>
+  <object gid="136" x="200" y="518"/>
+  <object gid="136" x="200" y="504"/>
+  <object gid="136" x="200" y="490"/>
+  <object gid="136" x="180" y="490"/>
+  <object gid="136" x="180" y="504"/>
+  <object gid="136" x="180" y="518"/>
+  <object gid="136" x="20" y="490"/>
+  <object gid="136" x="20" y="504"/>
+  <object gid="136" x="40" y="518"/>
+  <object gid="136" x="20" y="518"/>
+  <object gid="136" x="60" y="532"/>
+  <object gid="136" x="80" y="532"/>
+  <object gid="136" x="100" y="532"/>
+  <object gid="136" x="120" y="532"/>
+  <object gid="136" x="60" y="518"/>
+  <object gid="136" x="80" y="518"/>
+  <object gid="136" x="100" y="518"/>
+  <object gid="136" x="120" y="518"/>
  </objectgroup>
 </map>

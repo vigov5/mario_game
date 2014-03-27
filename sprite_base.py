@@ -19,11 +19,11 @@ class SpriteBase(pygame.sprite.Sprite):
     vx = 0
     vy = 0
     # vertical and horizontal state
-    v_state = "standing"
-    h_state = "resting"
+    h_state = "standing"
+    v_state = "resting"
     # vertical and horizontal facing
-    v_facing = ""
-    h_facing = ""
+    v_facing = "up"
+    h_facing = "right"
     # general state
     state = ""
 
@@ -31,6 +31,7 @@ class SpriteBase(pygame.sprite.Sprite):
     FRAMES = []
 
     frame_index = 0
+    rect = None
 
     def init_image_and_position(self, index, location):
         self.set_sprite(index)
@@ -71,6 +72,7 @@ class SpriteBase(pygame.sprite.Sprite):
 
 
     def set_sprite(self, index):
+        self.image = None
         img, cached = config.get_image_and_sprite(self.img_file)
         if index not in cached.keys():
             clip_rect = self.get_clip_rect(index)
@@ -79,8 +81,10 @@ class SpriteBase(pygame.sprite.Sprite):
             cached[index] = _surface
 
         self.image = cached[index]
+        if self.rect and self.rect.size != self.image.get_rect().size:
+            self.rect.size = self.image.get_rect().size
         # flip image if needed
-        if self.v_facing == "left":
+        if self.h_facing == "left":
             self.image = pygame.transform.flip(self.image, True, False)
 
 
@@ -130,12 +134,24 @@ class SpriteBase(pygame.sprite.Sprite):
     def hit_v_reversed_triggers(self, last, new, game):
         for cell in game.tilemap.layers['triggers'].collide(self.rect, 'v_reverse'):
             self.vx *= -1
-            if self.v_facing == "left":
-                self.v_facing = "right"
-            else:
-                self.v_facing = "left"
+            if self.h_facing == "left":
+                self.h_facing = "right"
+            elif self.h_facing == "right":
+                self.h_facing = "left"
             break
 
+
+    def turn_around(self, speed=None):
+        print self.h_facing
+        if not speed:
+            speed = self.vx
+        if self.h_facing == "left":
+            self.h_facing = "right"
+            self.vx = speed
+        elif self.h_facing == "right":
+            self.h_facing = "left"
+            self.vx = -speed
+            
 
     def set_blockers(self, game, value):
         cells = game.tilemap.layers['triggers'].get_in_region(
