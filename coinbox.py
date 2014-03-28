@@ -44,7 +44,9 @@ class CoinBox(sprite_base.SpriteBase):
                         self.set_blockers(game, "tlbr")
                     location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
                     self.my_coin = coin.Coin(location)
-        if self.count: self.count -= 1
+        if self.count:
+            self.count -= 1
+            game.my_mario.collected_coins += 1
         if self.box_type == HIDDEN or not self.count:
             self.box_type = BLANK
 

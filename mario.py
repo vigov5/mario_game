@@ -30,6 +30,7 @@ class Mario(sprite_base.SpriteBase):
     invi_time = 60
     halo = None
     lives = 3
+    collected_coins = 0
 
     def __init__(self, location, *groups):
         self.grow_up("small")
@@ -155,7 +156,7 @@ class Mario(sprite_base.SpriteBase):
                     if isinstance(enemy, turtle.Turtle):
                         self.hit_turtle(last, new, enemy, game)
                     elif isinstance(enemy, flower.Flower):
-                        self.go_dying(game)
+                        self.got_damaged(game)
 
             self.collision_with_platform(last, new, game)
         else:
@@ -245,8 +246,12 @@ class Mario(sprite_base.SpriteBase):
             else:
                 enemy.turn_with_speed("left", -5)
         else:
-            if self.grow_size == "medium":
-                self.grow_up("small")
-                self.became_invicible()
-            elif self.state != "invicible":
-                self.go_dying(game)             
+            self.got_damaged(game)
+
+
+    def got_damaged(self, game):
+        if self.grow_size == "medium":
+            self.grow_up("small")
+            self.became_invicible()
+        elif self.state != "invicible":
+            self.go_dying(game)             

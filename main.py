@@ -104,6 +104,7 @@ class MarioGame(object):
             for brick in self.bricks:
                 brick.draw_particles(screen)
             #self.draw_debug(screen)
+            self.draw_score_texts(screen)
             if self.my_mario.state == "dying":
                 self.draw_dying_screen(screen)
         else:
@@ -131,6 +132,16 @@ class MarioGame(object):
     def handle(self, event):
         self.my_mario.handle(event)
 
+
+    def draw_score_texts(self, screen):
+        if pygame.font:
+            lives_text = pygame.font.Font(None, 24).render("MARIO x %s" % self.my_mario.lives, 1, (255, 255, 255))
+            coins_text = pygame.font.Font(None, 24).render("COINS x %s" % self.my_mario.collected_coins, 1, (255, 255, 255))
+            over_textpos = lives_text.get_rect(left=10, top=10)
+            coins_textpos = coins_text.get_rect(right=self.width - 10, top=10)
+            self.screen.blit(lives_text, over_textpos)
+            self.screen.blit(coins_text, coins_textpos)
+    
 
     def draw_gameover_screen(self, screen):
         screen.fill(config.BLACK)
