@@ -9,6 +9,7 @@ SKY = 95, 183, 229
 BLANK_TILE = 72
 
 kaching_file = "ka_ching.ogg"
+one_up_file = "one_up.wav"
 
 # pool hold all sprites and images
 images_pool = {}
@@ -32,3 +33,7 @@ def load_image_with_alpha(image_name):
     _surface = pygame.Surface(clip_rect.size, pygame.SRCALPHA)
     _surface.blit(img, (0, 0), clip_rect)
     return _surface
+
+def play_sound(sound_file):
+    s = pygame.mixer.Sound(os.path.join(sound_path, sound_file))
+    s.play()

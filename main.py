@@ -69,7 +69,6 @@ class MarioGame(object):
             flower.Flower((_flower.px, _flower.py), color, self.enemies)
 
         self.powerups = tmx.SpriteLayer()
-        print self.enemies
         # layer order: background, midground + sprites, foreground
         self.insert_layer(self.powerups, "powerups", 1)
         self.insert_layer(self.coins, "coins", 2)

@@ -96,6 +96,9 @@ class Mario(sprite_base.SpriteBase):
         if self.state == "pipeing":
             self.vy = 1
             self.vx = 0
+        elif self.state == "dying":
+            self.vy = -1
+            self.vx = 0
         else:
             self.vx = min(self.MAX_VX, self.vx)
             self.vy = min(self.MAX_VY, self.vy)
@@ -129,6 +132,7 @@ class Mario(sprite_base.SpriteBase):
                         self.grow_up("medium")
                     elif p.type == powerup.ONE_UP:
                         self.lives += 1
+                        config.play_sound(config.one_up_file)
                     p.kill()
                     break
 
@@ -162,8 +166,7 @@ class Mario(sprite_base.SpriteBase):
                 if coin.rect.colliderect(new):
                     coin.kill()
                     self.collected_coins += 1
-                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, config.kaching_file))
-                    ka_ching.play()
+                    config.play_sound(config.kaching_file)
 
             self.collision_with_platform(last, new, game)
 

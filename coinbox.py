@@ -37,8 +37,7 @@ class CoinBox(sprite_base.SpriteBase):
         else:
             if self.count:
                 if self.my_coin == None:
-                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, config.kaching_file))
-                    ka_ching.play()
+                    config.play_sound(config.kaching_file)
                     if self.box_type == HIDDEN:
                         self.set_blockers(game, "tlbr")
                     location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
