@@ -30,6 +30,11 @@
     <property name="v_reverse" value="yes"/>
    </properties>
   </tile>
+  <tile id="7">
+   <properties>
+    <property name="coin" value="yes"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="143" name="triggers2x" tilewidth="40" tileheight="14">
   <image source="images/triggers2x.png" width="80" height="14"/>
@@ -225,5 +230,8 @@
   <object gid="136" x="80" y="518"/>
   <object gid="136" x="100" y="518"/>
   <object gid="136" x="120" y="518"/>
+  <object gid="140" x="80" y="406"/>
+  <object gid="140" x="100" y="406"/>
+  <object gid="140" x="120" y="406"/>
  </objectgroup>
 </map>

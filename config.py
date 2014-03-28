@@ -8,6 +8,8 @@ WHITE = 255, 255, 255
 SKY = 95, 183, 229
 BLANK_TILE = 72
 
+kaching_file = "ka_ching.ogg"
+
 # pool hold all sprites and images
 images_pool = {}
 sprites_pool = {}

@@ -3,7 +3,7 @@ import powerup
 import turtle
 import flower
 import config
-
+import os
 import sprite_base
 
 class Mario(sprite_base.SpriteBase):
@@ -158,7 +158,17 @@ class Mario(sprite_base.SpriteBase):
                     elif isinstance(enemy, flower.Flower):
                         self.got_damaged(game)
 
+            for coin in game.tilemap.layers["coins"]:
+                if coin.rect.colliderect(new):
+                    coin.kill()
+                    self.collected_coins += 1
+                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, config.kaching_file))
+                    ka_ching.play()
+
             self.collision_with_platform(last, new, game)
+
+            if self.rect.top - 80 > game.height:
+               self.go_dying(game)
         else:
             if new.bottom >= self.pipe_y + new.height:
                 self.state = "piped"

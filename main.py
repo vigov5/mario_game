@@ -3,6 +3,7 @@ import pygame
 
 import mario
 import coinbox
+import coin
 import brick
 import flower
 import config
@@ -56,20 +57,26 @@ class MarioGame(object):
         for _brick in self.tilemap.layers['triggers'].find('brick'):
             brick.Brick(self, (_brick.px, _brick.py), self.bricks)
 
+        self.coins = tmx.SpriteLayer()
+        for _coin in self.tilemap.layers['triggers'].find('coin'):
+            coin.Coin((_coin.px, _coin.py), self.coins)
+
         self.enemies = tmx.SpriteLayer()
         for _turtle in self.tilemap.layers['triggers'].find('turtle'):
             turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
         for _flower in self.tilemap.layers['triggers'].find('flower'):
             color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
-            flower.Flower(self, (_flower.px, _flower.py), color, self.enemies)
+            flower.Flower((_flower.px, _flower.py), color, self.enemies)
 
         self.powerups = tmx.SpriteLayer()
+        print self.enemies
         # layer order: background, midground + sprites, foreground
         self.insert_layer(self.powerups, "powerups", 1)
-        self.insert_layer(self.coinboxs, "coinboxs", 2)
-        self.insert_layer(self.bricks, "bricks", 3)
-        self.insert_layer(self.enemies, "enemies", 4)
-        self.insert_layer(self.sprites, "sprites", 5)
+        self.insert_layer(self.coins, "coins", 2)
+        self.insert_layer(self.coinboxs, "coinboxs", 3)
+        self.insert_layer(self.bricks, "bricks", 4)
+        self.insert_layer(self.enemies, "enemies", 5)
+        self.insert_layer(self.sprites, "sprites", 6)
 
 
     def insert_layer(self, sprites, layer_name, z_order):

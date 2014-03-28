@@ -16,7 +16,6 @@ class CoinBox(sprite_base.SpriteBase):
     FRAME_HEIGHT = 14
     PADDING = 0
     img_file = "map.png"
-    kaching_file = "ka_ching.ogg"
     count = 1
     my_coin = None
     ANIMATION_INTERVAL = 20
@@ -38,7 +37,7 @@ class CoinBox(sprite_base.SpriteBase):
         else:
             if self.count:
                 if self.my_coin == None:
-                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, self.kaching_file))
+                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, config.kaching_file))
                     ka_ching.play()
                     if self.box_type == HIDDEN:
                         self.set_blockers(game, "tlbr")

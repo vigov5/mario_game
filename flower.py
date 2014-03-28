@@ -13,7 +13,7 @@ class Flower(sprite_base.SpriteBase):
     ANIMATION_INTERVAL = 40
     h_facing = "down"
 
-    def __init__(self, game, location, color, *groups):
+    def __init__(self, location, color, *groups):
         self.color = color
         if self.color == GREEN_FLOWER:
             self.FRAMES = [2, 3]
