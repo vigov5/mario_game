@@ -11,6 +11,7 @@ class SpriteBase(pygame.sprite.Sprite):
     FRAME_HEIGHT = 0
     PADDING = 1
     img_file = ""
+    opacity = 255
 
     GRAVITY = 0.4
     MAX_VX = 3
@@ -19,11 +20,11 @@ class SpriteBase(pygame.sprite.Sprite):
     vx = 0
     vy = 0
     # vertical and horizontal state
-    v_state = "standing"
-    h_state = "resting"
+    h_state = "standing"
+    v_state = "resting"
     # vertical and horizontal facing
-    v_facing = ""
-    h_facing = ""
+    v_facing = "up"
+    h_facing = "right"
     # general state
     state = ""
 
@@ -31,6 +32,8 @@ class SpriteBase(pygame.sprite.Sprite):
     FRAMES = []
 
     frame_index = 0
+    rect = None
+    dead = False
 
     def init_image_and_position(self, index, location):
         self.set_sprite(index)
@@ -71,16 +74,22 @@ class SpriteBase(pygame.sprite.Sprite):
 
 
     def set_sprite(self, index):
+        self.image = None
         img, cached = config.get_image_and_sprite(self.img_file)
-        if index not in cached.keys():
+        key_name = "_".join(map(str, [index, self.opacity]))
+        if key_name not in cached.keys():
             clip_rect = self.get_clip_rect(index)
-            _surface = pygame.Surface((clip_rect.width, clip_rect.height), pygame.SRCALPHA)
+            _surface = pygame.Surface(clip_rect.size, pygame.SRCALPHA)
             _surface.blit(img, (0, 0), clip_rect)
-            cached[index] = _surface
+            # this works on images with per pixel alpha too
+            _surface.fill((255, 255, 255, self.opacity), None, pygame.BLEND_RGBA_MULT)
+            cached[key_name] = _surface
 
-        self.image = cached[index]
+        self.image = cached[key_name]
+        if self.rect and self.rect.size != self.image.get_rect().size:
+            self.rect.size = self.image.get_rect().size
         # flip image if needed
-        if self.v_facing == "left":
+        if self.h_facing == "left":
             self.image = pygame.transform.flip(self.image, True, False)
 
 
@@ -127,13 +136,17 @@ class SpriteBase(pygame.sprite.Sprite):
                 self.hit_platform_from_left(last, new, game)
 
 
+    def turn_with_speed(self, direction, speed):
+        self.h_facing = direction
+        self.vx = speed
+
+
     def hit_v_reversed_triggers(self, last, new, game):
         for cell in game.tilemap.layers['triggers'].collide(self.rect, 'v_reverse'):
-            self.vx *= -1
-            if self.v_facing == "left":
-                self.v_facing = "right"
-            else:
-                self.v_facing = "left"
+            if self.h_facing == "left":
+                self.turn_with_speed("right", 1)
+            elif self.h_facing == "right":
+                self.turn_with_speed("left", -1)
             break
 
 

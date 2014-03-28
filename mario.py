@@ -1,5 +1,8 @@
 import pygame
 import powerup
+import turtle
+import flower
+import config
 
 import sprite_base
 
@@ -24,6 +27,9 @@ class Mario(sprite_base.SpriteBase):
     state = "normal"
     pipe_obj = None
     grow_size = "small"
+    invi_time = 60
+    halo = None
+    lives = 3
 
     def __init__(self, location, *groups):
         self.grow_up("small")
@@ -34,46 +40,52 @@ class Mario(sprite_base.SpriteBase):
 
 
     def handle(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                if self.v_state == "resting":
-                    self.jump()
-            elif event.key == pygame.K_RIGHT:
-                self.move_right()
-            elif event.key == pygame.K_LEFT:
-                self.move_left()
-            elif event.key == pygame.K_DOWN:
-                self.v_state = "crouching"
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_RIGHT or \
-                event.key == pygame.K_LEFT:
-                self.vx = 0
-                self.h_state = "standing"
-            elif event.key == pygame.K_DOWN:
-                self.v_state = "resting"
+        if self.state != "dying":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    if self.v_state == "resting":
+                        self.jump()
+                elif event.key == pygame.K_RIGHT:
+                    self.move_right()
+                elif event.key == pygame.K_LEFT:
+                    self.move_left()
+                elif event.key == pygame.K_DOWN:
+                    self.v_state = "crouching"
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT or \
+                    event.key == pygame.K_LEFT:
+                    self.vx = 0
+                    self.h_state = "standing"
+                elif event.key == pygame.K_DOWN:
+                    self.v_state = "resting"
+        else:
+            if event.type == pygame.KEYDOWN:
+                if event.key == 13:
+                    self.state = "reborn"
 
 
-    def jump(self):
-        self.vy = -9
+    def jump(self, speed=9):
+        self.vy = -1*speed
         self.v_state = "jumping"
 
 
     def move_left(self):
         self.vx = -2.5
         self.h_state = "running"
-        self.v_facing = "left"
+        self.h_facing = "left"
 
 
     def move_right(self):
         self.vx = 2.5
         self.h_state = "running"
-        self.v_facing = "right"
+        self.h_facing = "right"
 
 
     def grow_up(self, size):
         self.grow_size = size
         self.img_file = self.sprite_imgs[self.grow_size]
-
+        if size == "medium":
+            self.rect.top -= 10
 
     def update(self, dt, game):
         last = self.rect.copy()
@@ -92,7 +104,11 @@ class Mario(sprite_base.SpriteBase):
         self.rect = self.rect.move(dx, dy)
 
         new = self.rect
-        if not self.state == "pipeing":
+        if self.state == "reborn":
+            self.reborn(game)
+        elif self.state == "dying":
+            self.halo.rect.top = self.rect.top - 10
+        elif not self.state == "pipeing":
             # collison with pipe
             if self.v_state == "crouching":
                 for pipe in game.tilemap.layers["triggers"].collide(new, "pipe"):
@@ -110,6 +126,8 @@ class Mario(sprite_base.SpriteBase):
                 if p.rect.colliderect(new) and p.state != "creating":
                     if p.type == powerup.MUSHROOM:
                         self.grow_up("medium")
+                    elif p.type == powerup.ONE_UP:
+                        self.lives += 1
                     p.kill()
                     break
 
@@ -131,6 +149,13 @@ class Mario(sprite_base.SpriteBase):
                             brick.got_hit(game)
                         new.top = brick.rect.bottom
                         self.vy = 0
+            for enemy in game.tilemap.layers["enemies"]:
+                # TODO check only enemy that near mario
+                if enemy.rect.colliderect(new):
+                    if isinstance(enemy, turtle.Turtle):
+                        self.hit_turtle(last, new, enemy, game)
+                    elif isinstance(enemy, flower.Flower):
+                        self.go_dying(game)
 
             self.collision_with_platform(last, new, game)
         else:
@@ -142,6 +167,10 @@ class Mario(sprite_base.SpriteBase):
 
         # change sprite
         self.frames_sizes = self.cell_sizes[self.grow_size]
+        if self.state == "invicible":
+            self.invi_time -= 1
+            if self.invi_time == 0:
+                self.back_to_normal()
         if self.v_state == "jumping":
             self.set_sprite(self.JUMP)
         else:
@@ -151,5 +180,73 @@ class Mario(sprite_base.SpriteBase):
                 super(Mario, self).update(dt, game)
 
 
+    def go_dying(self, game):
+        self.state = "dying"
+        self.create_halo_ring(game)
+        self.vx, self.vy = (0, -1)
+        self.v_state = "jumping"
+        self.GRAVITY = 0
+        self.lives -= 1
+        if self.lives == 0:
+            game.game_over = True
+
+
+    def reborn(self, game):
+        start_cell = game.tilemap.layers['triggers'].find('player')[0]
+        self.rect.topleft = (start_cell.px, start_cell.py)
+        self.state = "normal"
+        self.v_state = "resting"
+        self.h_state = "standing"
+        self.became_invicible()
+        self.vx, self.vy = (0, 0)
+        self.GRAVITY = 0.4
+        game.sprites.remove(self.halo)
+
+    def became_invicible(self):
+        self.state = "invicible"
+        self.opacity = 128
+        self.invi_time = 60
+
+    def back_to_normal(self):
+        self.state = "normal"
+        self.opacity = 255
+        self.invi_time = 60
+
+
+    def create_halo_ring(self, game):
+        if not self.halo:
+            self.halo = pygame.sprite.Sprite()
+            self.halo.image = config.load_image_with_alpha("halo.png")
+            self.halo.rect = self.halo.image.get_rect()
+        self.halo.rect.topleft = self.rect.topleft
+        self.halo.rect.top = self.rect.top - 10
+        self.halo.rect.left += (self.rect.width - self.halo.rect.width)/2
+        game.sprites.add(self.halo)
+
+
     def hit_platform_from_bottom(self, last, new, game):
         self.v_state = "resting"
+
+
+    def hit_turtle(self, last, new, enemy, game):
+        if last.bottom <= enemy.rect.top and new.bottom >= enemy.rect.top:
+            self.jump(12)
+            if enemy.state == "normal":
+                enemy.change_to_shell()
+            elif enemy.state == "shell":
+                if enemy.h_state == "running":
+                    enemy.change_to_shell()
+                else:
+                    enemy.do_shelling(self)
+        elif enemy.state == "shell" and enemy.h_state == "standing":
+            enemy.h_state = "running"
+            if self.rect.left < enemy.rect.left:
+                enemy.turn_with_speed("right", 5)
+            else:
+                enemy.turn_with_speed("left", -5)
+        else:
+            if self.grow_size == "medium":
+                self.grow_up("small")
+                self.became_invicible()
+            elif self.state != "invicible":
+                self.go_dying(game)             
