@@ -3,6 +3,7 @@ import pygame
 
 import mario
 import coinbox
+import coin
 import brick
 import flower
 import config
@@ -38,7 +39,7 @@ class MarioGame(object):
         if first_time:
             self.sprites = tmx.SpriteLayer()
             start_cell = self.tilemap.layers['triggers'].find('player')[0]
-            self.my_mario = mario.Mario((100, 100), self.sprites)
+            self.my_mario = mario.Mario((start_cell.px, start_cell.py), self.sprites)
         else:
             start_cell = self.tilemap.layers['triggers'].find(new_pos)[0]
         self.my_mario.rect.topleft = (start_cell.px, start_cell.py)
@@ -56,20 +57,25 @@ class MarioGame(object):
         for _brick in self.tilemap.layers['triggers'].find('brick'):
             brick.Brick(self, (_brick.px, _brick.py), self.bricks)
 
+        self.coins = tmx.SpriteLayer()
+        for _coin in self.tilemap.layers['triggers'].find('coin'):
+            coin.Coin((_coin.px, _coin.py), self.coins)
+
         self.enemies = tmx.SpriteLayer()
         for _turtle in self.tilemap.layers['triggers'].find('turtle'):
             turtle.Turtle((_turtle.px, _turtle.py), self.enemies)
         for _flower in self.tilemap.layers['triggers'].find('flower'):
             color = getattr(flower, _flower.properties.get("color", "GREEN_FLOWER"))
-            flower.Flower(self, (_flower.px, _flower.py), color, self.enemies)
+            flower.Flower((_flower.px, _flower.py), color, self.enemies)
 
         self.powerups = tmx.SpriteLayer()
         # layer order: background, midground + sprites, foreground
         self.insert_layer(self.powerups, "powerups", 1)
-        self.insert_layer(self.coinboxs, "coinboxs", 2)
-        self.insert_layer(self.bricks, "bricks", 3)
-        self.insert_layer(self.enemies, "enemies", 4)
-        self.insert_layer(self.sprites, "sprites", 5)
+        self.insert_layer(self.coins, "coins", 2)
+        self.insert_layer(self.coinboxs, "coinboxs", 3)
+        self.insert_layer(self.bricks, "bricks", 4)
+        self.insert_layer(self.enemies, "enemies", 5)
+        self.insert_layer(self.sprites, "sprites", 6)
 
 
     def insert_layer(self, sprites, layer_name, z_order):
@@ -104,6 +110,7 @@ class MarioGame(object):
             for brick in self.bricks:
                 brick.draw_particles(screen)
             #self.draw_debug(screen)
+            self.draw_score_texts(screen)
             if self.my_mario.state == "dying":
                 self.draw_dying_screen(screen)
         else:
@@ -131,6 +138,16 @@ class MarioGame(object):
     def handle(self, event):
         self.my_mario.handle(event)
 
+
+    def draw_score_texts(self, screen):
+        if pygame.font:
+            lives_text = pygame.font.Font(None, 24).render("MARIO x %s" % self.my_mario.lives, 1, (255, 255, 255))
+            coins_text = pygame.font.Font(None, 24).render("COINS x %s" % self.my_mario.collected_coins, 1, (255, 255, 255))
+            over_textpos = lives_text.get_rect(left=10, top=10)
+            coins_textpos = coins_text.get_rect(right=self.width - 10, top=10)
+            self.screen.blit(lives_text, over_textpos)
+            self.screen.blit(coins_text, coins_textpos)
+    
 
     def draw_gameover_screen(self, screen):
         screen.fill(config.BLACK)

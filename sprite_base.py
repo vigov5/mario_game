@@ -158,9 +158,9 @@ class SpriteBase(pygame.sprite.Sprite):
             if getattr(cell, "tile"):
                 if value:
                     cell.properties["blockers"] = value
-                else:
+                elif cell.properties.get("blockers"):
                     del cell.properties["blockers"]
-
+            break
 
     def get_self_rect(self):
         ox, oy = self.group[0].position

@@ -16,7 +16,6 @@ class CoinBox(sprite_base.SpriteBase):
     FRAME_HEIGHT = 14
     PADDING = 0
     img_file = "map.png"
-    kaching_file = "ka_ching.ogg"
     count = 1
     my_coin = None
     ANIMATION_INTERVAL = 20
@@ -38,13 +37,14 @@ class CoinBox(sprite_base.SpriteBase):
         else:
             if self.count:
                 if self.my_coin == None:
-                    ka_ching = pygame.mixer.Sound(os.path.join(config.sound_path, self.kaching_file))
-                    ka_ching.play()
+                    config.play_sound(config.kaching_file)
                     if self.box_type == HIDDEN:
                         self.set_blockers(game, "tlbr")
                     location = (my_pos.midtop[0] - self.COIN_WIDTH/2, my_pos.top) 
                     self.my_coin = coin.Coin(location)
-        if self.count: self.count -= 1
+        if self.count:
+            self.count -= 1
+            game.my_mario.collected_coins += 1
         if self.box_type == HIDDEN or not self.count:
             self.box_type = BLANK
 

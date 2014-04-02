@@ -3,7 +3,6 @@ import powerup
 import turtle
 import flower
 import config
-
 import sprite_base
 
 class Mario(sprite_base.SpriteBase):
@@ -30,6 +29,8 @@ class Mario(sprite_base.SpriteBase):
     invi_time = 60
     halo = None
     lives = 3
+    collected_coins = 0
+    my_brick = None
 
     def __init__(self, location, *groups):
         self.grow_up("small")
@@ -51,6 +52,9 @@ class Mario(sprite_base.SpriteBase):
                     self.move_left()
                 elif event.key == pygame.K_DOWN:
                     self.v_state = "crouching"
+                elif event.key == pygame.K_SPACE:
+                    if self.my_brick:
+                        self.my_brick.state = "throwed"
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or \
                     event.key == pygame.K_LEFT:
@@ -95,6 +99,9 @@ class Mario(sprite_base.SpriteBase):
         if self.state == "pipeing":
             self.vy = 1
             self.vx = 0
+        elif self.state == "dying":
+            self.vy = -1
+            self.vx = 0
         else:
             self.vx = min(self.MAX_VX, self.vx)
             self.vy = min(self.MAX_VY, self.vy)
@@ -128,6 +135,7 @@ class Mario(sprite_base.SpriteBase):
                         self.grow_up("medium")
                     elif p.type == powerup.ONE_UP:
                         self.lives += 1
+                        config.play_sound(config.one_up_file)
                     p.kill()
                     break
 
@@ -143,21 +151,53 @@ class Mario(sprite_base.SpriteBase):
                 # TODO check only brick that inside current viewport
                 if brick.rect.colliderect(new) \
                     and new.centerx > brick.rect.left and new.centerx < brick.rect.right \
-                    and last.top >= brick.rect.bottom and new.top < brick.rect.bottom:
+                    and last.top >= brick.rect.bottom and new.top < brick.rect.bottom \
+                    and brick != self.my_brick:
                     if not brick.broken:
-                        if self.grow_size != "small":
-                            brick.got_hit(game)
                         new.top = brick.rect.bottom
                         self.vy = 0
+                        if self.grow_size != "small":
+                            brick.got_hit(game)
+                        elif self.grow_size == "small" and not self.my_brick \
+                            and pygame.key.get_pressed()[pygame.K_SPACE]:
+                            self.my_brick = brick
+                            self.my_brick.state = "holded"
+                            brick.set_blockers(game, None)
             for enemy in game.tilemap.layers["enemies"]:
                 # TODO check only enemy that near mario
                 if enemy.rect.colliderect(new):
                     if isinstance(enemy, turtle.Turtle):
                         self.hit_turtle(last, new, enemy, game)
                     elif isinstance(enemy, flower.Flower):
-                        self.go_dying(game)
+                        self.got_damaged(game)
+
+            for coin in game.tilemap.layers["coins"]:
+                if coin.rect.colliderect(new):
+                    coin.kill()
+                    self.collected_coins += 1
+                    config.play_sound(config.kaching_file)
 
             self.collision_with_platform(last, new, game)
+
+            if self.my_brick:
+                if self.h_facing == "left":
+                    if self.my_brick.state == "holded":
+                        self.my_brick.rect.top = self.rect.top
+                        self.my_brick.rect.left = self.rect.left - 14
+                    elif self.my_brick.state == "throwed":
+                        self.my_brick.turn_with_speed("left", -10)
+                        self.my_brick = None
+                else:
+                    if self.my_brick.state == "holded":
+                        self.my_brick.rect.top = self.rect.top
+                        self.my_brick.rect.right = self.rect.right + 14
+                    elif self.my_brick.state == "throwed":
+                        self.my_brick.turn_with_speed("right", 10)
+                        self.my_brick = None
+
+            # quick hack
+            if self.rect.top - 80 > game.height:
+               self.go_dying(game)
         else:
             if new.bottom >= self.pipe_y + new.height:
                 self.state = "piped"
@@ -187,6 +227,9 @@ class Mario(sprite_base.SpriteBase):
         self.v_state = "jumping"
         self.GRAVITY = 0
         self.lives -= 1
+        if self.my_brick:
+            self.my_brick.got_hit(game)
+            self.my_brick = None
         if self.lives == 0:
             game.game_over = True
 
@@ -245,8 +288,12 @@ class Mario(sprite_base.SpriteBase):
             else:
                 enemy.turn_with_speed("left", -5)
         else:
-            if self.grow_size == "medium":
-                self.grow_up("small")
-                self.became_invicible()
-            elif self.state != "invicible":
-                self.go_dying(game)             
+            self.got_damaged(game)
+
+
+    def got_damaged(self, game):
+        if self.grow_size == "medium":
+            self.grow_up("small")
+            self.became_invicible()
+        elif self.state != "invicible":
+            self.go_dying(game)             
