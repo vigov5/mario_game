@@ -1,14 +1,11 @@
 import sys
 import pygame
-
-import mario
-import config
 import tmx
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
-class MarioGame(object):
+class MarioGame():
 
     width = 640
     height = 480
@@ -23,13 +20,7 @@ class MarioGame(object):
         self.clock = self.pygame.time.Clock()
         self.time_step = 0
         # TODO: init sprite, tile,...
-        self.tilemap = tmx.load('map.tmx', self.screen.get_size())
-        start_cell = self.tilemap.layers['triggers'].find('player')[0]
-
-        self.sprites = tmx.SpriteLayer()
-        self.my_mario = mario.Mario(self.sprites)
-        self.my_mario.set_position(start_cell.px, start_cell.py)
-        self.tilemap.layers.append(self.sprites)
+        self.tilemap = tmx.load("map.tmx", self.screen.get_size())
 
     def run(self):
         # main game loop
@@ -44,26 +35,29 @@ class MarioGame(object):
                 # sprite handle event
                 self.handle(event)
 
-            self.tilemap.update(dt / 1000., self)
+            self.update(dt / 1000.)
             # re-draw screen
             self.draw(self.screen)
 
     def draw(self, screen):
-        screen.fill(config.SKY)
+        screen.fill((95, 183, 229)) # sky color
         if pygame.font:
             font = pygame.font.Font(None, 36)
             text = font.render("Hello World !", 1, (255, 0, 0))
             textpos = text.get_rect(centerx=self.width/2)
             self.screen.blit(text, textpos)
-        # TODO: sprite draw
+        # TODO: sprite tilemap
+        self.tilemap.set_focus(0, 480)
         self.tilemap.draw(screen)
         self.pygame.display.flip()
 
-    def update(self):
-        self.my_mario.update()
+    def update(self, dt):
+        #self.mariosprite.update()
+        pass
 
     def handle(self, event):
-        self.my_mario.handle(event)
+        #self.my_mario.handle(event)
+        pass
 
 if __name__ == '__main__':
     g = MarioGame()
