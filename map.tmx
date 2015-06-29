@@ -32,7 +32,6 @@
     <property name="blockers" value="tlrb"/>
    </properties>
   </object>
-  <object gid="1" x="40" y="518"/>
   <object name="wall" x="0" y="0" width="20" height="560">
    <properties>
     <property name="blockers" value="tlbr"/>

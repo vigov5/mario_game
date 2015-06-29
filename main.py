@@ -1,6 +1,7 @@
 import sys
 import pygame
 import tmx
+import mario
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
@@ -21,6 +22,10 @@ class MarioGame():
         self.time_step = 0
         # TODO: init sprite, tile,...
         self.tilemap = tmx.load("map.tmx", self.screen.get_size())
+        self.sprites = tmx.SpriteLayer()
+        self.my_mario = mario.Mario(self.sprites)
+        self.my_mario.set_position(100, 400)
+        self.tilemap.layers.append(self.sprites)
 
     def run(self):
         # main game loop
@@ -52,11 +57,11 @@ class MarioGame():
         self.pygame.display.flip()
 
     def update(self, dt):
-        #self.mariosprite.update()
+        self.my_mario.update(dt, self)
         pass
 
     def handle(self, event):
-        #self.my_mario.handle(event)
+        self.my_mario.handle(event)
         pass
 
 if __name__ == '__main__':
